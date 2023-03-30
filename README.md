@@ -6,7 +6,7 @@ Real time sitting posture detection using YOLO framework
 #### Windows
  1. `git clone https://github.com/itakurah/SittingPostureDetection.git`
  2. `python -m venv venv`
- 3. `venv\scripts\activate.bat`
+ 3. `.\venv\scripts\activate.bat`
  4. `pip install -r ./requirements.txt`
 
 #### Linux
