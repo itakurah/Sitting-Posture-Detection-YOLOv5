@@ -1,12 +1,16 @@
+import os
 import sys
 import random
 import cv2
+from PyQt5 import QtWidgets
+from qt_material import apply_stylesheet
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QFont
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
 from worker_thread_camera import WorkerThreadCamera
+import tempfile
 
 
 class Application(QMainWindow):
@@ -18,7 +22,7 @@ class Application(QMainWindow):
         self.timer = QTimer()
         self.prev_frame_time = 0
         self.IMAGE_BOX_SIZE = 600
-        cbox_camera_list_width = 150
+        cbox_camera_list_width = 200
         cbox_camera_list_x = 20
         cbox_camera_list_y = 20
         self.camera_mapping = {}
@@ -44,13 +48,13 @@ class Application(QMainWindow):
         self.image_camera.setFixedWidth(600)
         self.image_camera.setFixedHeight(450)
         self.image_camera.move(cbox_camera_list_x, cbox_camera_list_y + 30)
-        #self.image_camera.adjustSize()
+        # self.image_camera.adjustSize()
         self.update_pixmap()
 
         # btn_start settings
-        btn_start_width = 60
+        btn_start_width = 80
         btn_start_height = 27
-        btn_start_x = cbox_camera_list_x + cbox_camera_list_width
+        btn_start_x = cbox_camera_list_x + cbox_camera_list_width+5
         btn_start_y = 50
         self.btn_start = QPushButton('start', self)
         self.btn_start.setFixedHeight(btn_start_height)
@@ -59,11 +63,11 @@ class Application(QMainWindow):
         self.btn_start.clicked.connect(self.on_btn_start_clicked)
 
         # btn_stop
-        btn_stop_x = btn_start_width + btn_start_x
+        btn_stop_x = btn_start_width + btn_start_x + 5
         btn_stop_y = 50
         self.btn_stop = QPushButton('stop', self)
         self.btn_stop.setFixedHeight(27)
-        self.btn_stop.setFixedWidth(60)
+        self.btn_stop.setFixedWidth(80)
         self.btn_stop.move(btn_stop_x, cbox_camera_list_y - 1)
         self.btn_stop.clicked.connect(self.on_btn_stop_clicked)
 
@@ -106,25 +110,24 @@ class Application(QMainWindow):
         self.timer1.start(2000)
 
         self.image_camera.setStyleSheet("border: 1px solid black")
-        #QtCore.QCoreApplication.processEvents()
-        #QtCore.QCoreApplication.processEvents()
-        #print(self.camera_mapping)
-        #print(self.camera_mapping.get(current_item))
+        # QtCore.QCoreApplication.processEvents()
+        # QtCore.QCoreApplication.processEvents()
+        # print(self.camera_mapping)
+        # print(self.camera_mapping.get(current_item))
 
     # on click stop button
     def on_btn_stop_clicked(self):
         self.stop_worker_thread_camera()
-        self.cbox_camera_list.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.timer2 = QTimer(self)
         self.timer2.timeout.connect(self.enable_btn_start)
         self.timer2.start(2000)
 
-        #QtCore.QCoreApplication.processEvents()
+        # QtCore.QCoreApplication.processEvents()
         self.status_bar.showMessage('Stream stopped..')
         QtCore.QCoreApplication.processEvents()
         self.status_bar.showMessage('Idle')
-        #QtCore.QCoreApplication.processEvents()
+        # QtCore.QCoreApplication.processEvents()
 
     def enable_btn_stop(self):
         self.btn_stop.setEnabled(True)
@@ -133,6 +136,7 @@ class Application(QMainWindow):
 
     def enable_btn_start(self):
         self.btn_start.setEnabled(True)
+        self.cbox_camera_list.setEnabled(True)
         self.timer2.stop()
         self.timer2.setInterval(2000)
 
@@ -173,7 +177,7 @@ class Application(QMainWindow):
         self.status_bar.showMessage('Getting camera stream..')
         QtCore.QCoreApplication.processEvents()
         rgb_frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        if rgb_frame.shape[0]>rgb_frame.shape[1]:
+        if rgb_frame.shape[0] > rgb_frame.shape[1]:
             rgb_frame_resized = self.image_resize(rgb_frame, None, self.IMAGE_BOX_SIZE)
         else:
             rgb_frame_resized = self.image_resize(rgb_frame, self.IMAGE_BOX_SIZE)
@@ -186,7 +190,7 @@ class Application(QMainWindow):
         bytes_per_line = 3 * width
         q_image = QImage(rgb_frame_resized.data, width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(q_image)
-        #self.resize(q_image.width(), q_image.height())
+        # self.resize(q_image.width(), q_image.height())
         self.image_camera.adjustSize()
         self.image_camera.setPixmap(pixmap)
         self.image_camera.update()
@@ -221,7 +225,6 @@ class Application(QMainWindow):
         self.timer.timeout.connect(self.update_pixmap)
         self.timer.start(0)
 
-
     def stop_worker_thread_camera(self):
         if self.work_thread_camera is not None:
             self.work_thread_camera.stop()
@@ -230,7 +233,6 @@ class Application(QMainWindow):
         if self.camera is not None:
             self.camera.release()
             self.camera = None
-
 
     # get connected camera id's from opencv
     @staticmethod
@@ -244,7 +246,7 @@ class Application(QMainWindow):
                 if not ret:
                     print("Can't receive frame (stream end?). Exiting ...")
                     break
-        #print(available_ports)
+        # print(available_ports)
         return available_ports
 
     # get all connected cameras from pyqt5
@@ -264,7 +266,7 @@ class Application(QMainWindow):
     @staticmethod
     def update_camera_mapping(keys, values):
         mapping = dict(zip(keys, values))
-        #print(mapping)
+        # print(mapping)
         return mapping
 
     # resize image to specific width and height
@@ -300,7 +302,26 @@ class Application(QMainWindow):
         # return the resized image
         return resized
 
+
+style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
+<resources>
+  <color name="primaryColor">#ffffff</color>
+  <color name="primaryLightColor">#ffffff</color>
+  <color name="secondaryColor">#b3b3b3</color>
+  <color name="secondaryLightColor">#4f5b62</color>
+  <color name="secondaryDarkColor">#31363b</color>
+  <color name="primaryTextColor">#000000</color>
+  <color name="secondaryTextColor">#ffffff</color>
+</resources>'''
+
 app = QApplication([])
 window = Application()
+with tempfile.NamedTemporaryFile(suffix='.xml', delete=False) as tmp:
+    # Write the XML string to the temporary file
+    tmp.write(style.encode('utf-8'))
+    # Close the temporary file
+    tmp.close()
+    apply_stylesheet(app, theme=tmp.name)
+os.unlink(tmp.name)
 window.show()
 sys.exit(app.exec())
