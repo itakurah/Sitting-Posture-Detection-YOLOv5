@@ -14,3 +14,6 @@ Real time sitting posture detection using YOLO framework
  2. `python3 -m venv venv`
  3. `source venv/bin/activate`
  4. `pip3 install -r requirements.txt`
+
+# License
+This project is licensed under the MIT License. See the LICENSE file for details.
