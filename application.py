@@ -6,6 +6,7 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
+from worker_thread import WorkThread
 
 
 class Application(QMainWindow):
@@ -96,7 +97,6 @@ class Application(QMainWindow):
     # on click start button
     def on_btn_start_clicked(self):
         self.status_bar.showMessage('Stream started..')
-        print('Button clicked')
         self.cbox_camera_list.setEnabled(False)
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
@@ -104,8 +104,8 @@ class Application(QMainWindow):
         self.image_camera.setStyleSheet("border: 1px solid black")
         #QtCore.QCoreApplication.processEvents()
         current_item = self.cbox_camera_list.currentText()
-        print(self.camera_mapping)
-        print(self.camera_mapping.get(current_item))
+        #print(self.camera_mapping)
+        #print(self.camera_mapping.get(current_item))
         self.workThread = WorkThread(self.camera_mapping.get(current_item))
         self.workThread.update_Camera.connect(self.draw_camera)
         self.workThread.start()
@@ -167,11 +167,6 @@ class Application(QMainWindow):
         self.cbox_camera_list.setEnabled(True)
         self.status_bar.showMessage('Idle')
 
-
-    def closeEvent(self, event):
-        self.status_bar.showMessage('Quitting..')
-        event.accept()
-
     def draw_camera(self, img, fps):
         self.status_bar.showMessage('Getting camera stream..')
         QtCore.QCoreApplication.processEvents()
@@ -211,7 +206,7 @@ class Application(QMainWindow):
                 if not ret:
                     print("Can't receive frame (stream end?). Exiting ...")
                     break
-        print(available_ports)
+        #print(available_ports)
         return available_ports
 
     # get all connected cameras from pyqt5
@@ -231,7 +226,7 @@ class Application(QMainWindow):
     @staticmethod
     def update_camera_mapping(keys, values):
         mapping = dict(zip(keys, values))
-        print(mapping)
+        #print(mapping)
         return mapping
 
     # resize image to specific width and height
@@ -266,43 +261,6 @@ class Application(QMainWindow):
 
         # return the resized image
         return resized
-
-
-class WorkThread(QtCore.QThread):
-    update_Camera = QtCore.pyqtSignal(object, object)
-
-    def __init__(self, id):
-        # Use super() to call __init__() methods in the parent classes
-        super(WorkThread, self).__init__()
-
-        # Place the camera object in the WorkThread
-        self.frame = None
-        self.camera = cv2.VideoCapture(id)
-
-        # The boolean variable to break the while loop in self.run() method
-        self.running = True
-
-    def run(self):
-        frame_count = 0
-        start_time = time.time()
-        fps = 0
-        while self.running:
-            # Read one frame
-            b, self.frame = self.camera.read()
-            #fps = 0
-            if b:
-                frame_count += 1
-                elapsed_time = time.time() - start_time
-                if elapsed_time >= 1:
-                    fps = frame_count / elapsed_time
-                    frame_count = 0
-                    start_time = time.time()
-            self.update_Camera.emit(self.frame, fps)
-
-    def stop(self):
-        # Terminate the while loop in self.run() method
-        self.running = False
-
 
 app = QApplication([])
 window = Application()
