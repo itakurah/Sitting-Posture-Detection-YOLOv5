@@ -1,12 +1,12 @@
 import sys
-import time
-
+import random
 import cv2
-from PyQt5 import QtCore
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QFont
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
-from worker_thread import WorkThread
+from worker_thread_camera import WorkerThreadCamera
 
 
 class Application(QMainWindow):
@@ -15,7 +15,7 @@ class Application(QMainWindow):
         super().__init__()
         width = 640
         height = 540
-        h, w = (0,0)
+        self.timer = QTimer()
         self.prev_frame_time = 0
         self.IMAGE_BOX_SIZE = 600
         cbox_camera_list_width = 150
@@ -23,7 +23,7 @@ class Application(QMainWindow):
         cbox_camera_list_y = 20
         self.camera_mapping = {}
         self.camera = None
-        self.workThread = None
+        self.work_thread_camera = None
 
         # window settings
         self.setWindowTitle("YOLO Sitting Posture Detector")
@@ -41,11 +41,11 @@ class Application(QMainWindow):
         # image settings
         self.image_camera = QLabel(self)
         self.image_camera.setStyleSheet("border: 0px solid black")
-        self.image_camera.setHidden(True)
-        p = QPixmap('')
-        self.image_camera.setPixmap(p)
+        self.image_camera.setFixedWidth(600)
+        self.image_camera.setFixedHeight(450)
         self.image_camera.move(cbox_camera_list_x, cbox_camera_list_y + 30)
-        self.image_camera.adjustSize()
+        #self.image_camera.adjustSize()
+        self.update_pixmap()
 
         # btn_start settings
         btn_start_width = 60
@@ -81,7 +81,6 @@ class Application(QMainWindow):
 
         # define signals for updates
         self.cbox_camera_list.currentTextChanged.connect(self.on_cbox_camera_changed)
-        # self.cbox_camera_list.currentTextChanged.connect(self.btn_start.setEnabled(False))
 
         # load cbox items
         self.update_cbox_items()
@@ -96,42 +95,50 @@ class Application(QMainWindow):
 
     # on click start button
     def on_btn_start_clicked(self):
+        self.timer.stop()
+        current_item = self.cbox_camera_list.currentText()
+        self.start_worker_thread_camera(current_item)
         self.status_bar.showMessage('Stream started..')
         self.cbox_camera_list.setEnabled(False)
         self.btn_start.setEnabled(False)
-        self.btn_stop.setEnabled(True)
-        self.image_camera.setHidden(False)
+        self.timer1 = QTimer(self)
+        self.timer1.timeout.connect(self.enable_btn_stop)
+        self.timer1.start(2000)
+
         self.image_camera.setStyleSheet("border: 1px solid black")
         #QtCore.QCoreApplication.processEvents()
-        current_item = self.cbox_camera_list.currentText()
+        #QtCore.QCoreApplication.processEvents()
         #print(self.camera_mapping)
         #print(self.camera_mapping.get(current_item))
-        self.workThread = WorkThread(self.camera_mapping.get(current_item))
-        self.workThread.update_Camera.connect(self.draw_camera)
-        self.workThread.start()
 
     # on click stop button
     def on_btn_stop_clicked(self):
-        self.status_bar.showMessage('Stream stopped..',2000)
-        QtCore.QCoreApplication.processEvents()
+        self.stop_worker_thread_camera()
         self.cbox_camera_list.setEnabled(True)
-        self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
-        self.image_camera.setHidden(True)
-        if self.workThread is not None:
-            self.workThread.stop()
-            self.workThread.wait()
-            self.workThread = None
-        if self.camera is not None:
-            self.camera.release()
-            self.camera = None
+        self.timer2 = QTimer(self)
+        self.timer2.timeout.connect(self.enable_btn_start)
+        self.timer2.start(2000)
+
+        #QtCore.QCoreApplication.processEvents()
         self.status_bar.showMessage('Stream stopped..')
         QtCore.QCoreApplication.processEvents()
         self.status_bar.showMessage('Idle')
         #QtCore.QCoreApplication.processEvents()
 
+    def enable_btn_stop(self):
+        self.btn_stop.setEnabled(True)
+        self.timer1.stop()
+        self.timer1.setInterval(2000)
+
+    def enable_btn_start(self):
+        self.btn_start.setEnabled(True)
+        self.timer2.stop()
+        self.timer2.setInterval(2000)
+
     # update combobox items with current available cameras
     def on_cbox_camera_changed(self):
+        QtCore.QCoreApplication.processEvents()
         self.cbox_camera_list.setEnabled(False)
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(False)
@@ -140,17 +147,15 @@ class Application(QMainWindow):
         if self.is_camera_connected():
             self.update_cbox_items()
         # do your code
+        QtCore.QCoreApplication.processEvents()
         self.cbox_camera_list.setEnabled(True)
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(True)
+        QtCore.QCoreApplication.processEvents()
 
     # update combobox items 
     def update_cbox_items(self):
         self.status_bar.showMessage('Updating camera list..')
-        QtCore.QCoreApplication.processEvents()
-        self.btn_start.setEnabled(False)
-        self.btn_stop.setEnabled(False)
-        self.cbox_camera_list.setEnabled(False)
         QtCore.QCoreApplication.processEvents()
         self.cbox_camera_list.currentTextChanged.disconnect(self.on_cbox_camera_changed)
         text = self.cbox_camera_list.currentText()
@@ -162,9 +167,6 @@ class Application(QMainWindow):
         if index >= 0:
             self.cbox_camera_list.setCurrentIndex(index)
         self.cbox_camera_list.currentTextChanged.connect(self.on_cbox_camera_changed)
-        self.btn_start.setEnabled(True)
-        self.btn_stop.setEnabled(True)
-        self.cbox_camera_list.setEnabled(True)
         self.status_bar.showMessage('Idle')
 
     def draw_camera(self, img, fps):
@@ -184,15 +186,51 @@ class Application(QMainWindow):
         bytes_per_line = 3 * width
         q_image = QImage(rgb_frame_resized.data, width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(q_image)
-        self.resize(q_image.width(), q_image.height())
+        #self.resize(q_image.width(), q_image.height())
         self.image_camera.adjustSize()
         self.image_camera.setPixmap(pixmap)
         self.image_camera.update()
 
     # update the statusbar while streaming
     def update_statusbar(self, h, w, fps):
-        self.camera_size.setText("image size: " + str(h) + "x" + str(w))
+        self.camera_size.setText("image size: " + str(w) + "x" + str(h))
         self.camera_fps.setText("fps: {:.2f}".format(fps))
+
+    def update_pixmap(self):
+        pixmap = QtGui.QPixmap(600, 450)
+        pixmap.fill(QtGui.QColor("black"))
+        painter = QtGui.QPainter(pixmap)
+        font = QtGui.QFont('Arial', 20)
+        painter.setFont(font)
+        painter.setPen(QtGui.QColor(255, 255, 255))
+        painter.drawText(pixmap.rect(), QtCore.Qt.AlignCenter, "Camera not available")
+        painter.end()
+        self.image_camera.adjustSize()
+        self.image_camera.setPixmap(pixmap)
+        self.image_camera.update()
+
+    def start_worker_thread_camera(self, current_item):
+        self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item))
+        self.work_thread_camera.update_camera.connect(self.draw_camera)
+        self.work_thread_camera.start()
+        self.work_thread_camera.finished.connect(self.test)
+
+    def test(self):
+        print("reached")
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_pixmap)
+        self.timer.start(0)
+
+
+    def stop_worker_thread_camera(self):
+        if self.work_thread_camera is not None:
+            self.work_thread_camera.stop()
+            self.work_thread_camera.wait()
+            self.work_thread_camera = None
+        if self.camera is not None:
+            self.camera.release()
+            self.camera = None
+
 
     # get connected camera id's from opencv
     @staticmethod
