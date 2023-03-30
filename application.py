@@ -1,16 +1,16 @@
 import os
 import sys
-import random
+import tempfile
+
 import cv2
-from PyQt5 import QtWidgets
-from qt_material import apply_stylesheet
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QFont
+from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
+from qt_material import apply_stylesheet
+
 from worker_thread_camera import WorkerThreadCamera
-import tempfile
 
 
 class Application(QMainWindow):
@@ -54,7 +54,7 @@ class Application(QMainWindow):
         # btn_start settings
         btn_start_width = 80
         btn_start_height = 27
-        btn_start_x = cbox_camera_list_x + cbox_camera_list_width+5
+        btn_start_x = cbox_camera_list_x + cbox_camera_list_width + 5
         btn_start_y = 50
         self.btn_start = QPushButton('start', self)
         self.btn_start.setFixedHeight(btn_start_height)

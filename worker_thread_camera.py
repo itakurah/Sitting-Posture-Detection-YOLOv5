@@ -1,6 +1,8 @@
-from PyQt5 import QtCore
-import cv2
 import time
+
+import cv2
+from PyQt5 import QtCore
+
 
 class WorkerThreadCamera(QtCore.QThread):
     update_camera = QtCore.pyqtSignal(object, object)
