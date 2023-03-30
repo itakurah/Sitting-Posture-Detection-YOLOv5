@@ -2,12 +2,12 @@ from PyQt5 import QtCore
 import cv2
 import time
 
-class WorkThread(QtCore.QThread):
-    update_Camera = QtCore.pyqtSignal(object, object)
+class WorkerThreadCamera(QtCore.QThread):
+    update_camera = QtCore.pyqtSignal(object, object)
 
     def __init__(self, id):
         # Use super() to call __init__() methods in the parent classes
-        super(WorkThread, self).__init__()
+        super(WorkerThreadCamera, self).__init__()
 
         # Place the camera object in the WorkThread
         self.frame = None
@@ -31,7 +31,7 @@ class WorkThread(QtCore.QThread):
                     fps = frame_count / elapsed_time
                     frame_count = 0
                     start_time = time.time()
-            self.update_Camera.emit(self.frame, fps)
+            self.update_camera.emit(self.frame, fps)
 
     def stop(self):
         # Terminate the while loop in self.run() method
