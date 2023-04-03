@@ -3,9 +3,12 @@ import time
 import cv2
 from PyQt5 import QtCore
 
+from load_model import Model
+
 
 class WorkerThreadCamera(QtCore.QThread):
-    update_camera = QtCore.pyqtSignal(object, object)
+    update_camera = QtCore.pyqtSignal(object, object, object)
+    model = Model()
 
     def __init__(self, id):
         # Use super() to call __init__() methods in the parent classes
@@ -14,6 +17,9 @@ class WorkerThreadCamera(QtCore.QThread):
         # Place the camera object in the WorkThread
         self.frame = None
         self.camera = cv2.VideoCapture(id)
+        self.camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
         # The boolean variable to break the while loop in self.run() method
         self.running = True
@@ -33,8 +39,24 @@ class WorkerThreadCamera(QtCore.QThread):
                     fps = frame_count / elapsed_time
                     frame_count = 0
                     start_time = time.time()
-            self.update_camera.emit(self.frame, fps)
+            results = self.model.predict(self.frame)
+
+            xB, xA, yB, yA = 0, 0, 0, 0
+            for box in results.xyxy[0]:
+                xB = int(box[2])
+                xA = int(box[0])
+                yB = int(box[3])
+                yA = int(box[1])
+            # labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+            # print(labels)
+            # print(cord_thres)
+            cv2.rectangle(self.frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
+
+            # results = self.model.predict(self.rgb_frame_resized)
+            self.update_camera.emit(self.frame, fps, results)
 
     def stop(self):
         # Terminate the while loop in self.run() method
         self.running = False
+        self.camera.release()
+        cv2.destroyAllWindows()
