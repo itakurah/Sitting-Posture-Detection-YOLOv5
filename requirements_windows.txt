@@ -7,3 +7,4 @@ PyQt5-Qt5==5.15.2
 PyQt5-sip==12.11.1
 PyQt5-stubs==5.15.6.0
 qt-material==2.14
+yolov5==7.0.11
