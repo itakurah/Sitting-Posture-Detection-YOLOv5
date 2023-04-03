@@ -19,7 +19,6 @@ class Application(QMainWindow):
         super().__init__()
         width = 640
         height = 540
-        self.timer = QTimer()
         self.prev_frame_time = 0
         self.IMAGE_BOX_SIZE = 600
         cbox_camera_list_width = 200
@@ -41,6 +40,7 @@ class Application(QMainWindow):
         self.cbox_camera_list.move(cbox_camera_list_x, cbox_camera_list_y)
         self.cbox_camera_list.setFixedWidth(cbox_camera_list_width)
         self.cbox_camera_list.setFixedHeight(25)
+        self.cbox_camera_list.currentTextChanged.connect(self.on_cbox_camera_changed)
 
         # image settings
         self.image_camera = QLabel(self)
@@ -84,11 +84,26 @@ class Application(QMainWindow):
         self.status_bar.showMessage('Idle')
 
         # define signals for updates
-        self.cbox_camera_list.currentTextChanged.connect(self.on_cbox_camera_changed)
 
         # load cbox items
         self.update_cbox_items()
+
+        # disable stop button on start
         self.btn_stop.setEnabled(False)
+
+        # load model
+        # self.model = Model()
+        # self.res = self.model.predict('test.jpg')
+        # print(self.res)
+        # print(self.res.pandas().xyxy[0])
+        # print("f")
+        # print(self.model.predict('1.jpg'))
+
+        # create timer
+        self.timer_start = QTimer()
+        self.timer_start.timeout.connect(self.timer_timeout_start)
+        self.timer_stop = QTimer()
+        self.timer_stop.timeout.connect(self.timer_timeout_stop)
 
     # centers the main window
     def center_window(self):
@@ -99,46 +114,49 @@ class Application(QMainWindow):
 
     # on click start button
     def on_btn_start_clicked(self):
-        self.timer.stop()
-        current_item = self.cbox_camera_list.currentText()
-        self.start_worker_thread_camera(current_item)
-        self.status_bar.showMessage('Stream started..')
-        self.cbox_camera_list.setEnabled(False)
+        # disable elements
         self.btn_start.setEnabled(False)
-        self.timer1 = QTimer(self)
-        self.timer1.timeout.connect(self.enable_btn_stop)
-        self.timer1.start(2000)
+        self.cbox_camera_list.setEnabled(False)
 
+        # start timer
+        self.timer_start.start(2000)
+
+        # set current text from cbox
+        current_item = self.cbox_camera_list.currentText()
+
+        # start worker thread
+        self.start_worker_thread_camera(current_item)
+
+        self.status_bar.showMessage('Stream started..')
+
+        # set frame for Pixmap
         self.image_camera.setStyleSheet("border: 1px solid black")
-        # QtCore.QCoreApplication.processEvents()
-        # QtCore.QCoreApplication.processEvents()
-        # print(self.camera_mapping)
-        # print(self.camera_mapping.get(current_item))
 
     # on click stop button
     def on_btn_stop_clicked(self):
-        self.stop_worker_thread_camera()
         self.btn_stop.setEnabled(False)
-        self.timer2 = QTimer(self)
-        self.timer2.timeout.connect(self.enable_btn_start)
-        self.timer2.start(2000)
+        QtCore.QCoreApplication.processEvents()
+        self.timer_stop.start(2000)
 
-        # QtCore.QCoreApplication.processEvents()
+        # stop camera thread
+        self.stop_worker_thread_camera()
+
         self.status_bar.showMessage('Stream stopped..')
         QtCore.QCoreApplication.processEvents()
         self.status_bar.showMessage('Idle')
-        # QtCore.QCoreApplication.processEvents()
 
-    def enable_btn_stop(self):
-        self.btn_stop.setEnabled(True)
-        self.timer1.stop()
-        self.timer1.setInterval(2000)
+    def timer_timeout_stop(self):
+        # stop timer and toggle button state
+        self.timer_stop.stop()
+        if not self.btn_stop.isEnabled():
+            self.btn_start.setEnabled(True)
+            self.cbox_camera_list.setEnabled(True)
 
-    def enable_btn_start(self):
-        self.btn_start.setEnabled(True)
-        self.cbox_camera_list.setEnabled(True)
-        self.timer2.stop()
-        self.timer2.setInterval(2000)
+    def timer_timeout_start(self):
+        # stop timer and toggle button state
+        self.timer_start.stop()
+        if not self.btn_start.isEnabled():
+            self.btn_stop.setEnabled(True)
 
     # update combobox items with current available cameras
     def on_cbox_camera_changed(self):
@@ -154,7 +172,7 @@ class Application(QMainWindow):
         QtCore.QCoreApplication.processEvents()
         self.cbox_camera_list.setEnabled(True)
         self.btn_start.setEnabled(True)
-        self.btn_stop.setEnabled(True)
+        self.btn_stop.setEnabled(False)
         QtCore.QCoreApplication.processEvents()
 
     # update combobox items 
@@ -173,32 +191,63 @@ class Application(QMainWindow):
         self.cbox_camera_list.currentTextChanged.connect(self.on_cbox_camera_changed)
         self.status_bar.showMessage('Idle')
 
-    def draw_camera(self, img, fps):
+    def draw_camera(self, img, fps, results):
         self.status_bar.showMessage('Getting camera stream..')
         QtCore.QCoreApplication.processEvents()
         rgb_frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if rgb_frame.shape[0] > rgb_frame.shape[1]:
-            rgb_frame_resized = self.image_resize(rgb_frame, None, self.IMAGE_BOX_SIZE)
+            self.rgb_frame_resized = self.image_resize(rgb_frame, None, self.IMAGE_BOX_SIZE)
         else:
-            rgb_frame_resized = self.image_resize(rgb_frame, self.IMAGE_BOX_SIZE)
+            self.rgb_frame_resized = self.image_resize(rgb_frame, self.IMAGE_BOX_SIZE)
         # get height and width
-        h, w = rgb_frame_resized.shape[:2]
+        self.h, self.w = self.rgb_frame_resized.shape[:2]
+        # self.work_thread_prediction = WorkerThreadPrediction(self.model,self.rgb_frame_resized)
+        # self.work_thread_prediction.prediction_done.connect(self.handle_prediction_results)
+        # self.work_thread_prediction.start()
+        # predict frame
+        # results = self.model.predict(self.rgb_frame_resized)
+        # print(results)
+        labels, cord_thres = results.xyxyn[0][:, -1].cpu().numpy(), results.xyxyn[0][:,
+                                                                    :-1].cpu().numpy()  # *************************
         # update statusbar
-        self.update_statusbar(h, w, fps)
+        self.update_statusbar(self.h, self.w, fps, labels)
 
-        height, width, channel = rgb_frame_resized.shape
+        height, width, channel = self.rgb_frame_resized.shape
         bytes_per_line = 3 * width
-        q_image = QImage(rgb_frame_resized.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        # print(type(self.rgb_frame_resized))
+        q_image = QImage(self.rgb_frame_resized.data, width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(q_image)
-        # self.resize(q_image.width(), q_image.height())
+        self.resize(q_image.width(), q_image.height())
+        self.image_camera.adjustSize()
+        self.image_camera.setPixmap(pixmap)
+        self.image_camera.update()
+
+    def handle_prediction_results(self, results):
+        # handle the prediction results here
+        labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+        # update statusbar and display the image
+        self.update_statusbar(self.h, self.w, self.fps, labels)
+
+        height, width, channel = self.rgb_frame_resized.shape
+        bytes_per_line = 3 * width
+        q_image = QImage(self.rgb_frame_resized.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(q_image)
         self.image_camera.adjustSize()
         self.image_camera.setPixmap(pixmap)
         self.image_camera.update()
 
     # update the statusbar while streaming
-    def update_statusbar(self, h, w, fps):
+    def update_statusbar(self, h, w, fps, labels):
         self.camera_size.setText("image size: " + str(w) + "x" + str(h))
         self.camera_fps.setText("fps: {:.2f}".format(fps))
+        # print(labels)
+        if labels.size > 0:
+            if int(labels[0]) == 0:
+                self.class_info.setText("detected class: sitting_good")
+            else:
+                self.class_info.setText("detected class: sitting_bad")
+        else:
+            self.class_info.setText("detected class: no class")
 
     def update_pixmap(self):
         pixmap = QtGui.QPixmap(600, 450)
@@ -217,13 +266,6 @@ class Application(QMainWindow):
         self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item))
         self.work_thread_camera.update_camera.connect(self.draw_camera)
         self.work_thread_camera.start()
-        self.work_thread_camera.finished.connect(self.test)
-
-    def test(self):
-        print("reached")
-        self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.update_pixmap)
-        self.timer.start(0)
 
     def stop_worker_thread_camera(self):
         if self.work_thread_camera is not None:
@@ -302,12 +344,16 @@ class Application(QMainWindow):
         # return the resized image
         return resized
 
+    def closeEvent(self, event):
+        cv2.destroyAllWindows()
+        self.stop_worker_thread_camera()
+
 
 style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
   <color name="primaryColor">#ffffff</color>
-  <color name="primaryLightColor">#ffffff</color>
-  <color name="secondaryColor">#b3b3b3</color>
+  <color name="primaryLightColor">#6e6d6d</color>
+  <color name="secondaryColor">#8f8f8f</color>
   <color name="secondaryLightColor">#4f5b62</color>
   <color name="secondaryDarkColor">#31363b</color>
   <color name="primaryTextColor">#000000</color>
