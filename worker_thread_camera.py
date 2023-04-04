@@ -17,10 +17,11 @@ class WorkerThreadCamera(QtCore.QThread):
         # Place the camera object in the WorkThread
         self.frame = None
         self.camera = cv2.VideoCapture(id)
+        # set video format to mjpg to compress the frames to increase fps
         self.camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        # set frame resolution
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
-
         # The boolean variable to break the while loop in self.run() method
         self.running = True
 
@@ -29,9 +30,8 @@ class WorkerThreadCamera(QtCore.QThread):
         start_time = time.time()
         fps = 0
         while self.running:
-            # Read one frame
+            # read one frame
             b, self.frame = self.camera.read()
-            # fps = 0
             if b:
                 frame_count += 1
                 elapsed_time = time.time() - start_time
@@ -39,24 +39,12 @@ class WorkerThreadCamera(QtCore.QThread):
                     fps = frame_count / elapsed_time
                     frame_count = 0
                     start_time = time.time()
+            # predict using model
             results = self.model.predict(self.frame)
-
-            xB, xA, yB, yA = 0, 0, 0, 0
-            for box in results.xyxy[0]:
-                xB = int(box[2])
-                xA = int(box[0])
-                yB = int(box[3])
-                yA = int(box[1])
-            # labels, cord_thres = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
-            # print(labels)
-            # print(cord_thres)
-            cv2.rectangle(self.frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
-
-            # results = self.model.predict(self.rgb_frame_resized)
             self.update_camera.emit(self.frame, fps, results)
 
     def stop(self):
-        # Terminate the while loop in self.run() method
+        # terminate the while loop in self.run() method
         self.running = False
         self.camera.release()
         cv2.destroyAllWindows()
