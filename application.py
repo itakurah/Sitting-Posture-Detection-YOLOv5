@@ -4,6 +4,8 @@ import tempfile
 
 import cv2
 import os
+
+import psutil
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap, QImage, QColor, QPainter
@@ -12,14 +14,21 @@ from PyQt5.QtWidgets import *
 from qt_material import apply_stylesheet
 
 from worker_thread_camera import WorkerThreadCamera
+from worker_thread_memory import WorkerThreadMemory
 
 
 class Application(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        width = 870
-        height = 540
+        self.memory_usage = None
+        self.confidence = None
+        self.class_name = None
+        self.width = None
+        self.height = None
+        self.fps = None
+        self.gui_width = 870
+        self.gui_height = 540
         self.prev_frame_time = 0
         self.IMAGE_BOX_SIZE = 600
         cbox_camera_list_width = 200
@@ -29,12 +38,11 @@ class Application(QMainWindow):
         self.camera_mapping = {}
         self.camera = None
         self.work_thread_camera = None
-        
 
         # window settings
         self.setWindowTitle("YOLO Sitting Posture Detector")
-        self.setGeometry(100, 100, width, height)
-        self.setFixedSize(width, height)
+        self.setGeometry(100, 100, self.gui_width, self.gui_height)
+        self.setFixedSize(self.gui_width, self.gui_height)
         self.center_window()
 
         # combobox settings
@@ -61,7 +69,7 @@ class Application(QMainWindow):
         self.qlabel_no_camera.setFixedWidth(600)
         self.qlabel_no_camera.setFixedHeight(450)
         self.qlabel_no_camera.move(cbox_camera_list_x, cbox_camera_list_y + 30)
-        self.update_pixmap_no_camera()
+        self.show_pause_frame()
 
         # btn_start settings
         btn_start_width = 80
@@ -155,7 +163,7 @@ class Application(QMainWindow):
 
         # settings bounding box drawing
         self.box_color = (0, 255, 0)
-        self.box_thickness = 2
+        self.box_thickness = 1
 
         # settings text drawing
         self.text_color_conf = (0, 255, 0)
@@ -163,7 +171,7 @@ class Application(QMainWindow):
         self.text_color_bg = (0, 0, 0)
         self.text_thickness = 1
         self.text_font = cv2.FONT_HERSHEY_SIMPLEX
-        self.text_font_scale = 0.2
+        self.text_font_scale = 0.5
         self.pos_x = 0
         self.pos_y = 0
 
@@ -204,10 +212,20 @@ class Application(QMainWindow):
                                                     "padding-top:  8px;"
                                                     "padding-left: 8px;} ")
         self.groupbox_general_options.move(630, 300)
-        self.cbox_enable_debug = QCheckBox('debug mode', self.groupbox_general_options)
+        self.cbox_enable_debug = QCheckBox('developer mode', self.groupbox_general_options)
         self.cbox_enable_debug.move(10, 30)
         self.cbox_enable_debug.setChecked(True)
         self.cbox_enable_debug.stateChanged.connect(self.set_debug_mode)
+
+        # start memory thread
+        self.worker_thread_memory = WorkerThreadMemory()
+        self.worker_thread_memory.update_memory.connect(self.update_memory_usage)
+        self.worker_thread_memory.start()
+
+    def update_memory_usage(self):
+        self.memory_usage = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+        self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
+        print(self.memory_usage)
 
     # show or hide debug features
     def set_debug_mode(self):
@@ -251,7 +269,6 @@ class Application(QMainWindow):
     def on_btn_start_clicked(self):
         self.flag_is_camera_thread_running = True
         # disable gui elements
-        self.qlabel_no_camera.setHidden(True)
         self.label_stream.setHidden(False)
         self.btn_start.setEnabled(False)
         self.cbox_camera_list.setEnabled(False)
@@ -261,6 +278,7 @@ class Application(QMainWindow):
         current_item = self.cbox_camera_list.currentText()
         # start worker thread
         self.start_worker_thread_camera(current_item)
+        self.qlabel_no_camera.setHidden(True)
         # set frame for Pixmap
         # self.label_stream.setStyleSheet("border: 2px solid black")
 
@@ -419,6 +437,7 @@ class Application(QMainWindow):
         if self.flag_is_camera_thread_running:
             self.status_bar.showMessage('getting camera stream..')
         QtCore.QCoreApplication.processEvents()
+        class_name, confidence = None, None
         # convert to rgb format
         frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # resize to fit into QImage element
@@ -428,6 +447,7 @@ class Application(QMainWindow):
             frame = self.image_resize(frame, self.IMAGE_BOX_SIZE)
         # get height and width of frame
         height, width = frame.shape[:2]
+        # format results as pandas table
         results = results.pandas().xyxy[0].to_dict(orient="records")
         if results:
             # get single results from prediction
@@ -435,18 +455,13 @@ class Application(QMainWindow):
             self.draw_items(frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence)
         else:
             self.label_stream.setStyleSheet("border: 2px solid black")
-        if self.flag_is_camera_thread_running:
-            # update statusbar
-            if not results:
-                self.update_statusbar(height, width, fps)
-            else:
-                self.update_statusbar(height, width, fps, class_name, confidence)
         # convert frame to QPixmap format
         bytes_per_line = 3 * width
         q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(q_image)
         # add border to frame
         pixmap = self.draw_black_border(pixmap)
+        self.update_statusbar(height, width, fps, class_name, confidence)
         self.label_stream.setPixmap(QPixmap.fromImage(pixmap))
         self.label_stream.adjustSize()
         self.label_stream.update()
@@ -480,21 +495,21 @@ class Application(QMainWindow):
         return border_pixmap
 
     # update the statusbar while streaming
-    def update_statusbar(self, h=None, w=None, fps=None, class_frame=None, confidence=None):
+    def update_statusbar(self, height, width, fps, class_name, confidence):
         # update image size label
-        if (h is None) & (w is None):
+        if (height is None) & (width is None):
             self.label_dim.setText("image size: -")
         else:
-            self.label_dim.setText("image size: " + str(w) + "x" + str(h))
+            self.label_dim.setText("image size: " + str(width) + "x" + str(height))
         # update fps label
         if fps is None:
             self.label_fps.setText("fps: -")
         else:
             self.label_fps.setText("fps: {:.2f}".format(fps))
         # update detected class
-        if class_frame is None:
+        if class_name is None:
             self.label_class_info.setText("detected class: no class")
-        elif class_frame == 0:
+        elif class_name == 0:
             self.label_class_info.setText("detected class: sitting_good")
         else:
             self.label_class_info.setText("detected class: sitting_bad")
@@ -503,9 +518,10 @@ class Application(QMainWindow):
             self.label_conf.setText('conf: -')
         else:
             self.label_conf.setText('conf: {:.2f}'.format(confidence))
+        #self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
 
     # update pixmap with when no camera is available
-    def update_pixmap_no_camera(self):
+    def show_pause_frame(self):
         # draw camera not available info frame
         pixmap = QPixmap(600, 450)
         pixmap.fill(QtGui.QColor("black"))
@@ -522,7 +538,7 @@ class Application(QMainWindow):
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
         self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item))
-        self.work_thread_camera.finished.connect(self.update_statusbar)
+        # self.work_thread_camera.finished.connect(self.update_statusbar)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
 
@@ -532,14 +548,14 @@ class Application(QMainWindow):
         if self.work_thread_camera is not None:
             self.work_thread_camera.stop()
             self.work_thread_camera.wait()
-            self.update_pixmap_no_camera()
+            self.show_pause_frame()
             self.work_thread_camera = None
         if self.camera is not None:
             self.camera.release()
             self.camera = None
         cv2.destroyAllWindows()
         self.flag_is_camera_thread_running = False
-        self.update_statusbar()
+        # self.update_statusbar()
 
     # get connected camera id's from opencv
     @staticmethod
@@ -612,6 +628,7 @@ class Application(QMainWindow):
     def closeEvent(self, event):
         cv2.destroyAllWindows()
         self.stop_worker_thread_camera()
+        self.worker_thread_memory.stop()
 
 
 style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
