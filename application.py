@@ -1,10 +1,9 @@
+import os
 import random
 import sys
 import tempfile
 
 import cv2
-import os
-
 import psutil
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer, Qt
@@ -518,7 +517,7 @@ class Application(QMainWindow):
             self.label_conf.setText('conf: -')
         else:
             self.label_conf.setText('conf: {:.2f}'.format(confidence))
-        #self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
+        # self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
 
     # update pixmap with when no camera is available
     def show_pause_frame(self):
