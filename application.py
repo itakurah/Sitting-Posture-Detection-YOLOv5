@@ -233,11 +233,13 @@ class Application(QMainWindow):
             self.label_class_info.setHidden(False)
             self.label_conf.setHidden(False)
             self.label_dim.setHidden(False)
+            self.label_memory_usage.setHidden(False)
         else:
             self.label_fps.setHidden(True)
             self.label_class_info.setHidden(True)
             self.label_conf.setHidden(True)
             self.label_dim.setHidden(True)
+            self.label_memory_usage.setHidden(True)
 
     # update color for frame and buttons
     def show_color_picker(self, button):
@@ -460,7 +462,10 @@ class Application(QMainWindow):
         pixmap = QPixmap.fromImage(q_image)
         # add border to frame
         pixmap = self.draw_black_border(pixmap)
-        self.update_statusbar(height, width, fps, class_name, confidence)
+        if self.flag_is_camera_thread_running:
+            self.update_statusbar(height, width, fps, class_name, confidence)
+        else:
+            self.update_statusbar()
         self.label_stream.setPixmap(QPixmap.fromImage(pixmap))
         self.label_stream.adjustSize()
         self.label_stream.update()
@@ -494,7 +499,7 @@ class Application(QMainWindow):
         return border_pixmap
 
     # update the statusbar while streaming
-    def update_statusbar(self, height, width, fps, class_name, confidence):
+    def update_statusbar(self, height=None, width=None, fps=None, class_name=None, confidence=None):
         # update image size label
         if (height is None) & (width is None):
             self.label_dim.setText("image size: -")
@@ -517,7 +522,6 @@ class Application(QMainWindow):
             self.label_conf.setText('conf: -')
         else:
             self.label_conf.setText('conf: {:.2f}'.format(confidence))
-        # self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
 
     # update pixmap with when no camera is available
     def show_pause_frame(self):
@@ -537,13 +541,12 @@ class Application(QMainWindow):
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
         self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item))
-        # self.work_thread_camera.finished.connect(self.update_statusbar)
+        #self.work_thread_camera.finished.connect(self.update_statusbar)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
 
     # stop camera worker thread
     def stop_worker_thread_camera(self):
-        self.flag_is_camera_thread_running
         if self.work_thread_camera is not None:
             self.work_thread_camera.stop()
             self.work_thread_camera.wait()
