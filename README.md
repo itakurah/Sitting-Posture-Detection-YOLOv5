@@ -1,6 +1,7 @@
 # Posture Detector using YOLOv5
 
 ![Product Name Screen Shot][product-screenshot]  
+
 This GitHub repository contains a posture detection program that utilizes YOLOv5, an advanced object detection algorithm, to detect and predict sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
 
 Key Features:
