@@ -1,6 +1,6 @@
 # SittingPostureDetection
 Real time sitting posture detection using YOLO framework
-
+[![Product Name Screen Shot][images/screenshot.png]]
 # Getting Started
 
 #### Windows
