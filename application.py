@@ -5,7 +5,7 @@ import tempfile
 
 import cv2
 import psutil
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap, QImage, QColor, QPainter
 from PyQt5.QtMultimedia import *
@@ -14,6 +14,7 @@ from qt_material import apply_stylesheet
 
 from worker_thread_camera import WorkerThreadCamera
 from worker_thread_memory import WorkerThreadMemory
+from worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
 class Application(QMainWindow):
@@ -65,10 +66,9 @@ class Application(QMainWindow):
         # image label settings
         self.qlabel_no_camera = QLabel(self)
         self.qlabel_no_camera.setStyleSheet("border: 0px solid black")
-        self.qlabel_no_camera.setFixedWidth(600)
-        self.qlabel_no_camera.setFixedHeight(450)
+        self.qlabel_no_camera.setFixedWidth(self.qlabel_stream_width)
+        self.qlabel_no_camera.setFixedHeight(self.qlabel_stream_height)
         self.qlabel_no_camera.move(cbox_camera_list_x, cbox_camera_list_y + 30)
-        self.show_pause_frame()
 
         # btn_start settings
         btn_start_width = 80
@@ -161,12 +161,12 @@ class Application(QMainWindow):
         self.timer_stop.timeout.connect(self.timer_timeout_stop)
 
         # settings bounding box drawing
-        self.box_color = (0, 255, 0)
-        self.box_thickness = 1
+        self.box_color = (251, 255, 12)
+        self.box_thickness = 2
 
         # settings text drawing
-        self.text_color_conf = (0, 255, 0)
-        self.text_color_class = (0, 255, 0)
+        self.text_color_conf = (251, 255, 12)
+        self.text_color_class = (251, 255, 12)
         self.text_color_bg = (0, 0, 0)
         self.text_thickness = 1
         self.text_font = cv2.FONT_HERSHEY_SIMPLEX
@@ -221,10 +221,15 @@ class Application(QMainWindow):
         self.worker_thread_memory.update_memory.connect(self.update_memory_usage)
         self.worker_thread_memory.start()
 
+        # start pause screen thread
+        self.worker_thread_pause_screen = WorkerThreadPauseScreen(self.qlabel_stream_width, self.qlabel_stream_height)
+        self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
+        self.worker_thread_pause_screen.start()
+
+    # update memory usage in statusbar
     def update_memory_usage(self):
         self.memory_usage = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
         self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
-        print(self.memory_usage)
 
     # show or hide debug features
     def set_debug_mode(self):
@@ -277,8 +282,11 @@ class Application(QMainWindow):
         self.timer_start.start(2000)
         # set current text from cbox
         current_item = self.cbox_camera_list.currentText()
+
         # start worker thread
         self.start_worker_thread_camera(current_item)
+        # stop worker thread
+        self.stop_wroker_thread_pause_screen()
         self.qlabel_no_camera.setHidden(True)
         # set frame for Pixmap
         # self.label_stream.setStyleSheet("border: 2px solid black")
@@ -294,6 +302,7 @@ class Application(QMainWindow):
         self.timer_stop.start(2000)
         # stop camera thread
         self.stop_worker_thread_camera()
+        self.start_wroker_thread_pause_screen()
         self.status_bar.showMessage('idle')
 
     # on timeout stop button
@@ -355,7 +364,7 @@ class Application(QMainWindow):
             cv2.rectangle(frame, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), self.box_color, self.box_thickness)
 
     # draw class name on frame
-    def draw_infomation(self, frame, class_name, confidence):
+    def draw_information(self, frame, class_name, confidence):
         # example text to get dimensions of actual text
         text_size, _ = cv2.getTextSize('confidence: 100.00%', self.text_font,
                                        self.text_font_scale, self.text_thickness)
@@ -431,7 +440,7 @@ class Application(QMainWindow):
     # draw items on frame
     def draw_items(self, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
         self.draw_bounding_box(frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2)
-        self.draw_infomation(frame, class_name, confidence)
+        self.draw_information(frame, class_name, confidence)
 
     # display frame to qlabel_stream
     def draw_frame(self, img, fps, results):
@@ -470,6 +479,7 @@ class Application(QMainWindow):
         self.label_stream.adjustSize()
         self.label_stream.update()
 
+    # extract items from results
     def get_results(self, results):
         (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = None, None, None, None, None, None
         for result in results:
@@ -524,24 +534,26 @@ class Application(QMainWindow):
             self.label_conf.setText('conf: {:.2f}'.format(confidence))
 
     # update pixmap with when no camera is available
-    def show_pause_frame(self):
-        # draw camera not available info frame
-        pixmap = QPixmap(600, 450)
-        pixmap.fill(QtGui.QColor("black"))
-        painter = QtGui.QPainter(pixmap)
-        font = QtGui.QFont('Arial', 20)
-        painter.setFont(font)
-        painter.setPen(QtGui.QColor(255, 255, 255))
-        painter.drawText(pixmap.rect(), QtCore.Qt.AlignCenter, "Camera not available")
-        painter.end()
+    def update_pause_frame(self, pixmap):
+        print(pixmap)
         self.qlabel_no_camera.adjustSize()
         self.qlabel_no_camera.setPixmap(pixmap)
+        # self.qlabel_no_camera.repaint()
         self.qlabel_no_camera.update()
+
+    # start camera worker thread
+    def start_wroker_thread_pause_screen(self):
+        self.worker_thread_pause_screen = WorkerThreadPauseScreen(self.qlabel_stream_width, self.qlabel_stream_height)
+        self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
+        self.worker_thread_pause_screen.start()
+
+    # stop pause screen worker thread
+    def stop_wroker_thread_pause_screen(self):
+        self.worker_thread_pause_screen.stop()
 
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
         self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item))
-        #self.work_thread_camera.finished.connect(self.update_statusbar)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
 
@@ -550,14 +562,12 @@ class Application(QMainWindow):
         if self.work_thread_camera is not None:
             self.work_thread_camera.stop()
             self.work_thread_camera.wait()
-            self.show_pause_frame()
             self.work_thread_camera = None
         if self.camera is not None:
             self.camera.release()
             self.camera = None
         cv2.destroyAllWindows()
         self.flag_is_camera_thread_running = False
-        # self.update_statusbar()
 
     # get connected camera id's from opencv
     @staticmethod
