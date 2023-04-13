@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import *
 from qt_material import apply_stylesheet
 
 from worker_thread_camera import WorkerThreadCamera
-from worker_thread_memory import WorkerThreadMemory
+from worker_thread_system_resource import WorkerThreadSystemResource
 from worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
@@ -22,6 +22,7 @@ class Application(QMainWindow):
     def __init__(self):
         super().__init__()
         self.memory_usage = None
+        self.cpu_usage = None
         self.confidence = None
         self.class_name = None
         self.width = None
@@ -144,6 +145,8 @@ class Application(QMainWindow):
         self.status_bar.addPermanentWidget(self.label_fps)
         self.label_memory_usage = QLabel('memory: -')
         self.status_bar.addPermanentWidget(self.label_memory_usage)
+        self.label_cpu_usage = QLabel('cpu: -')
+        self.status_bar.addPermanentWidget(self.label_cpu_usage)
 
         # show message
         self.status_bar.showMessage('idle')
@@ -217,8 +220,8 @@ class Application(QMainWindow):
         self.cbox_enable_debug.stateChanged.connect(self.set_debug_mode)
 
         # start memory thread
-        self.worker_thread_memory = WorkerThreadMemory()
-        self.worker_thread_memory.update_memory.connect(self.update_memory_usage)
+        self.worker_thread_memory = WorkerThreadSystemResource()
+        self.worker_thread_memory.update_memory.connect(self.update_system_resource)
         self.worker_thread_memory.start()
 
         # start pause screen thread
@@ -226,10 +229,12 @@ class Application(QMainWindow):
         self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
         self.worker_thread_pause_screen.start()
 
-    # update memory usage in statusbar
-    def update_memory_usage(self):
+    # update memory and cpu usage in statusbar
+    def update_system_resource(self):
         self.memory_usage = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
         self.label_memory_usage.setText('mem: {:.0f} MB'.format(self.memory_usage))
+        self.cpu_usage = psutil.cpu_percent(interval=None, percpu=False)
+        self.label_cpu_usage.setText('cpu: {:.0f} %'.format(self.cpu_usage))
 
     # show or hide debug features
     def set_debug_mode(self):
@@ -535,7 +540,6 @@ class Application(QMainWindow):
 
     # update pixmap with when no camera is available
     def update_pause_frame(self, pixmap):
-        print(pixmap)
         self.qlabel_no_camera.adjustSize()
         self.qlabel_no_camera.setPixmap(pixmap)
         # self.qlabel_no_camera.repaint()
