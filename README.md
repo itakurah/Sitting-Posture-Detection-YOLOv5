@@ -1,6 +1,7 @@
-# SittingPostureDetection
-Real time sitting posture detection using YOLO framework
+# YoloV5 Sitting Posture Detection
 ![Product Name Screen Shot][product-screenshot]
+### Built With
+![Python]
 # Getting Started
 
 #### Windows
@@ -20,3 +21,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [product-screenshot]: images/screenshot.png
+[Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
