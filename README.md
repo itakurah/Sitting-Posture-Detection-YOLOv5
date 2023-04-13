@@ -1,6 +1,6 @@
 # SittingPostureDetection
 Real time sitting posture detection using YOLO framework
-[![Product Name Screen Shot][images/screenshot.png]]
+[![Product Name Screen Shot][product-screenshot]]
 # Getting Started
 
 #### Windows
@@ -17,3 +17,6 @@ Real time sitting posture detection using YOLO framework
 
 # License
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[product-screenshot]: images/screenshot.png
