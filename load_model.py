@@ -7,7 +7,7 @@ import yolov5
 class Model:
     def __init__(self):
         # path to model
-        self.model_path = Path("./model/model_l_e500_i245_0_117_1_127.pt")  # modelv5.pt")
+        self.model_path = Path("./model/modelv5.pt")  # modelv5.pt")
         if torch.cuda.is_available():
             cuda = torch.device('cuda:0')
             # load model into memory
