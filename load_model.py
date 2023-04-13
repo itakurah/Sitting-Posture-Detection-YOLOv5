@@ -7,13 +7,16 @@ import yolov5
 class Model:
     def __init__(self):
         # path to model
-        self.model_path = Path("./model/modelv5.pt")  # modelv5.pt")
-        print(torch.cuda.is_available())
+        self.model_path = Path("./model/model_l_e500_i245_0_117_1_127.pt")  # modelv5.pt")
+        if torch.cuda.is_available():
+            cuda = torch.device('cuda:0')
+            # load model into memory
+            self.model = yolov5.load(str(self.model_path), device=cuda)
+        else:
+            self.model = yolov5.load(str(self.model_path), device='cpu')
+        #print(torch.cuda.is_available())
         # print(torch.cuda.get_device_properties(0).name)
-        print(torch.cuda.device_count())
-        cuda = torch.device('cuda:0')
-        # load model into memory
-        self.model = yolov5.load(str(self.model_path), device='cpu')  # 'cpu'
+        #print(torch.cuda.device_count())
         # settings for model
         self.model.label_conf = 0.50  # NMS confidence threshold
         self.model.iou = 0.70  # NMS IoU threshold
