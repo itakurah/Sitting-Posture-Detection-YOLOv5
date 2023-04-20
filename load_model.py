@@ -7,19 +7,23 @@ import yolov5
 class Model:
     def __init__(self):
         # path to model
-        self.model_path = Path("./model/modelv5.pt")  # modelv5.pt")
+        self.model_path = Path("./model/model_l_e307_i320_0_168_1_152.pt")  # modelv5.pt")
+        print(torch.cuda.is_available())
         if torch.cuda.is_available():
-            cuda = torch.device('cuda:0')
+            device_memory = {}
+            # get gpu with the highest memory
+            for i in range(torch.cuda.device_count()):
+                props = torch.cuda.get_device_properties(i)
+                device_memory[i] = props.total_memory
+            device_idx = max(device_memory, key=device_memory.get)
+            cuda = torch.device('cuda:{}'.format(device_idx))
             # load model into memory
-            self.model = yolov5.load(str(self.model_path), device=cuda)
+            self.model = yolov5.load(str(self.model_path), device=str(cuda))
         else:
             self.model = yolov5.load(str(self.model_path), device='cpu')
-        #print(torch.cuda.is_available())
-        # print(torch.cuda.get_device_properties(0).name)
-        #print(torch.cuda.device_count())
-        # settings for model
-        self.model.label_conf = 0.50  # NMS confidence threshold
-        self.model.iou = 0.70  # NMS IoU threshold
+        # model settings
+        self.model.label_conf = 0.0  # NMS confidence threshold
+        self.model.iou = 0.80  # NMS IoU threshold
         self.model.agnostic = False  # NMS class-agnostic
         self.model.multi_label = False  # NMS multiple labels per box
         self.model.max_det = 1  # maximum number of detections per image
@@ -27,3 +31,16 @@ class Model:
     # return prediction
     def predict(self, image):
         return self.model(image)
+
+    # extract items from results
+    @staticmethod
+    def get_results(results):
+        (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = None, None, None, None, None, None
+        for result in results:
+            confidence = result['confidence']
+            class_name = result['class']
+            bbox_x1 = int(result['xmin'])
+            bbox_y1 = int(result['ymin'])
+            bbox_x2 = int(result['xmax'])
+            bbox_y2 = int(result['ymax'])
+        return bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence
