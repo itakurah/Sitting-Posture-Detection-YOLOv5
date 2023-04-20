@@ -4,16 +4,18 @@ import cv2
 from PyQt5 import QtCore
 
 from load_model import Model
+from frame_helper import *
 
 
 class WorkerThreadCamera(QtCore.QThread):
     update_camera = QtCore.pyqtSignal(object, object, object)
     model = Model()
 
-    def __init__(self, id):
+    def __init__(self, id, slider_brightness, slider_contrast):
         # Use super() to call __init__() methods in the parent classes
         super(WorkerThreadCamera, self).__init__()
-
+        self.slider_brightness = slider_brightness
+        self.slider_contrast = slider_contrast
         # Place the camera object in the WorkThread
         self.frame = None
         self.camera = cv2.VideoCapture(id)
@@ -39,6 +41,10 @@ class WorkerThreadCamera(QtCore.QThread):
                     fps = frame_count / elapsed_time
                     frame_count = 0
                     start_time = time.time()
+            # change brightness based on slider value
+            self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
+            # change contrast based on slider value
+            self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
             # predict using model
             results = self.model.predict(self.frame)
             self.update_camera.emit(self.frame, fps, results)
