@@ -18,9 +18,6 @@ class WorkerThreadPauseScreen(QtCore.QThread):
         self.running = True
 
     def run(self):
-        print(self.width)
-        print(self.height)
-
         while self.running:
             # generate random RGB colors for all pixels in one step
             colors = np.random.rand(self.height, self.width, 3) * 255
