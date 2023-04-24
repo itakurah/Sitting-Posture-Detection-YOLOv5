@@ -1,10 +1,13 @@
 import cv2
 import numpy as np
 
+'''Class for handling frame manipulation 
+'''
+
 
 def change_contrast(image, contrast_factor):
     """
-    Change the contrast of an image.
+    Changes the contrast of an image.
 
     Args:
         image (numpy array): The input image as a NumPy ndarray.
@@ -31,7 +34,7 @@ def change_contrast(image, contrast_factor):
 
 def change_brightness(image, brightness_factor):
     """
-    Change the brightness of an image using NumPy element-wise array operations.
+    Changes the brightness of an image using NumPy element-wise array operations.
 
     Args:
         image (numpy array): The input image as a NumPy ndarray.
@@ -55,6 +58,19 @@ def change_brightness(image, brightness_factor):
 
 # resize image to specific width and height
 def resize_frame(image, width=None, height=None, inter=cv2.INTER_AREA):
+    """
+    Resizes an image to specific size
+
+    Args:
+        image (numpy array): The input image as a NumPy ndarray.
+        width: The width to resize the image to.
+        height: The height to resize the image to.
+        inter: The interpolation method to be applied, INTER_AREA (default).
+
+    Returns:
+        numpy array: The resized image.
+    """
+
     # initialize the dimensions of the image to be resized and
     # grab the image size
     dim = None

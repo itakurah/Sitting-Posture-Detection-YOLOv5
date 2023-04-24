@@ -6,14 +6,17 @@ from PyQt5 import QtCore
 from load_model import Model
 from frame_helper import *
 
+'''Thread class for handling the received frames
+'''
 
-class WorkerThreadCamera(QtCore.QThread):
+
+class WorkerThreadFrame(QtCore.QThread):
     update_camera = QtCore.pyqtSignal(object, object, object)
     model = Model()
 
     def __init__(self, id, slider_brightness, slider_contrast):
         # Use super() to call __init__() methods in the parent classes
-        super(WorkerThreadCamera, self).__init__()
+        super(WorkerThreadFrame, self).__init__()
         self.slider_brightness = slider_brightness
         self.slider_contrast = slider_contrast
         # Place the camera object in the WorkThread

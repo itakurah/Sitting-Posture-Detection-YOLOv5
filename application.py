@@ -15,7 +15,7 @@ import frame_helper
 import frame_settings
 import gui
 from load_model import Model
-from worker_thread_camera import WorkerThreadCamera
+from worker_thread_frame import WorkerThreadFrame
 from worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
@@ -353,8 +353,8 @@ class Application(QMainWindow):
 
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
-        self.work_thread_camera = WorkerThreadCamera(self.camera_mapping.get(current_item), self.slider_brightness,
-                                                     self.slider_contrast)
+        self.work_thread_camera = WorkerThreadFrame(self.camera_mapping.get(current_item), self.slider_brightness,
+                                                    self.slider_contrast)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
 

@@ -1,6 +1,5 @@
-
-from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioButton, QButtonGroup, QCheckBox, \
     QStatusBar, QDesktopWidget, QColorDialog, QSlider
 
@@ -8,8 +7,14 @@ from camera_helper import get_connected_camera_alias
 from worker_thread_pause_screen import WorkerThreadPauseScreen
 from worker_thread_system_resource import WorkerThreadSystemResource
 
+'''Class for creating the application view
+'''
+
 
 def load(self):
+    """
+    Loads the gui components
+    """
     # window settings
     self.gui_width = 870
     self.gui_height = 540
@@ -239,6 +244,9 @@ def load(self):
 
 # on timeout stop button
 def timer_timeout_stop(self):
+    """
+    Stops the timeout timer
+    """
     # stop timer and toggle button state
     self.timer_stop.stop()
     if not self.button_stop.isEnabled():
@@ -248,6 +256,10 @@ def timer_timeout_stop(self):
 
 # on timeout start button
 def timer_timeout_start(self):
+    """
+    Starts the timeout timer
+
+    """
     # stop timer and toggle button state
     self.timer_start.stop()
     if not self.button_start.isEnabled():
@@ -256,6 +268,10 @@ def timer_timeout_start(self):
 
 # centers the main window
 def center_window(self):
+    """
+    Centers the main window
+
+    """
     qr = self.frameGeometry()
     cp = QDesktopWidget().availableGeometry().center()
     qr.moveCenter(cp)
@@ -264,6 +280,12 @@ def center_window(self):
 
 # update color for frame and buttons
 def show_color_picker(self, button):
+    """
+    Shows the color picker menu
+
+    Args:
+        button: The button which the color is applied.
+    """
     color = QColorDialog.getColor()
     if color.isValid():
         # update the color tuple with the new RGB values
@@ -282,4 +304,11 @@ def show_color_picker(self, button):
 
 
 def update_slider_text(control, label):
+    """
+    Updates the text of the QLabel besides the slider
+
+    Args:
+        control: the control object to read from.
+        label: the label to be updated.
+    """
     label.setText(str(control.value()) + '%')

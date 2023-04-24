@@ -3,6 +3,9 @@ import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QImage
 
+'''Thread class for displaying the pause screen
+'''
+
 
 class WorkerThreadPauseScreen(QtCore.QThread):
     update_pause_screen = QtCore.pyqtSignal(QPixmap)

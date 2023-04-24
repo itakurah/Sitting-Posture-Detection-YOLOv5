@@ -3,11 +3,16 @@ from pathlib import Path
 import torch
 import yolov5
 
+'''Class for loading the Yolo-v5 model
+'''
+
+MODEL_NAME = 'modelv5.pt'
+
 
 class Model:
     def __init__(self):
         # path to model
-        self.model_path = Path("./model/modelv5.pt")  # modelv5.pt")
+        self.model_path = Path("./model/{}".format(MODEL_NAME))
         print(torch.cuda.is_available())
         if torch.cuda.is_available():
             device_memory = {}
@@ -22,7 +27,7 @@ class Model:
         else:
             self.model = yolov5.load(str(self.model_path), device='cpu')
         # model settings
-        self.model.label_conf = 0.0  # NMS confidence threshold
+        self.model.label_conf = 0.70  # NMS confidence threshold
         self.model.iou = 0.80  # NMS IoU threshold
         self.model.agnostic = False  # NMS class-agnostic
         self.model.multi_label = False  # NMS multiple labels per box
