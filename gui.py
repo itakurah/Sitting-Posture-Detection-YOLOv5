@@ -165,7 +165,7 @@ def load(self):
     self.groupbox_general_options.setStyleSheet("QGroupBox::title {"
                                                 "padding-top:  8px;"
                                                 "padding-left: 8px;} ")
-    self.groupbox_general_options.move(630, 390)
+    self.groupbox_general_options.move(630, 400)
     self.cbox_enable_debug = QCheckBox('Debug Info', self.groupbox_general_options)
     self.cbox_enable_debug.move(10, 30)
     self.cbox_enable_debug.setChecked(True)
@@ -215,6 +215,17 @@ def load(self):
     self.slider_contrast.valueChanged.connect(
         lambda: update_slider_text(self.slider_contrast, self.label_contrast_control))
 
+    self.button_reset_brightness = QPushButton('Reset', self.groupbox_frame_options)
+    self.button_reset_contrast = QPushButton('Reset', self.groupbox_frame_options)
+    self.button_reset_brightness.setFixedWidth(68)
+    self.button_reset_brightness.setFixedHeight(20)
+    self.button_reset_contrast.setFixedWidth(68)
+    self.button_reset_contrast.setFixedHeight(20)
+    self.button_reset_contrast.move(150, 312)
+    self.button_reset_contrast.setStyleSheet("font-size: 10px;")
+    self.button_reset_brightness.move(150, 267)
+    self.button_reset_brightness.setStyleSheet("font-size: 10px;")
+
     # start memory thread
     self.worker_thread_memory = WorkerThreadSystemResource()
     self.worker_thread_memory.update_memory.connect(self.update_system_resource)
@@ -235,6 +246,9 @@ def load(self):
     self.btn_color_class.clicked.connect(lambda: show_color_picker(self, self.btn_color_class))
     self.btn_color_conf.clicked.connect(lambda: show_color_picker(self, self.btn_color_conf))
     self.btn_color_bg.clicked.connect(lambda: show_color_picker(self, self.btn_color_bg))
+    self.button_reset_brightness.clicked.connect(lambda: self.slider_brightness.setValue(100))
+    self.button_reset_contrast.clicked.connect(lambda: self.slider_contrast.setValue(100))
+
     # load cbox items
     self.update_combobox_camera_list_items()
 
