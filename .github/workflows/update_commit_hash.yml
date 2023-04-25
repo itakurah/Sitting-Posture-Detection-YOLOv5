@@ -17,7 +17,7 @@ jobs:
 
       - name: Update commit hash file
         run: |
-          echo "COMMIT_HASH = '${{ steps.get_commit_hash.outputs.commit_hash }}'" > commit_hash.txt
+          echo "'${{ steps.get_commit_hash.outputs.commit_hash }}'" > commit_hash.txt
 
       - name: Commit and push changes
         run: |
