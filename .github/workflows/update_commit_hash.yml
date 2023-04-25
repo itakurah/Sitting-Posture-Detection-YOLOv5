@@ -24,7 +24,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update commit hash
-          commit_options: '--author="GitHub Action"'
+          commit_options: '--author "GitHub Action <noreply@github.com>"'
           commit_files: |
             commit_hash.txt
           git_user_name: GitHub Action
