@@ -1,12 +1,12 @@
 import cv2
 
-'''Class for OpenCV settings
+'''Class for OpenCV properties
 '''
 
 
 def load(self):
     """
-    Load the frame settings
+    Load the frame properties
     """
     # bounding box options
     # bbox color
