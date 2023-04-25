@@ -18,7 +18,7 @@ jobs:
         run: echo "::set-output name=commit_hash::$(git rev-parse --short HEAD)"
 
       - name: Update commit hash
-        run: echo ${{ steps.commit_hash.outputs.commit_hash }} > commit_hash.txt
+        run: echo "${{ steps.commit_hash.outputs.commit_hash }}" > commit_hash.txt
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -30,6 +30,3 @@ jobs:
           git_user_name: GitHub Action
           git_user_email: action@github.com
           branch: main
-
-    env:
-      COMMIT_HASH: ${{ steps.commit_hash.outputs.commit_hash }}
