@@ -1,3 +1,9 @@
+name: Update Commit Hash
+
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
