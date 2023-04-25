@@ -1,0 +1,28 @@
+name: Update Commit Hash
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_commit_hash:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get short commit hash
+        run: echo "::set-output name=commit_hash::$(git log -1 --format=%h)"
+
+      - name: Update commit hash file
+        run: |
+          echo "COMMIT_HASH = '${{ steps.get_commit_hash.outputs.commit_hash }}'" > commit_hash.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add commit_hash.txt
+          git commit -m "Update commit hash"
+          git push
