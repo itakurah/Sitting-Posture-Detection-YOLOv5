@@ -12,7 +12,7 @@ from qt_material import apply_stylesheet
 
 import camera_helper
 import frame_helper
-import frame_settings
+import frame_properties
 import gui
 from load_model import Model
 from worker_thread_frame import WorkerThreadFrame
@@ -78,8 +78,8 @@ class Application(QMainWindow):
         self.camera = None
         self.work_thread_camera = None
 
-        # load frame settings
-        frame_settings.load(self)
+        # load frame properties
+        frame_properties.load(self)
         # load gui
         gui.load(self)
 
@@ -126,7 +126,7 @@ class Application(QMainWindow):
 
     # on click stop button
     def on_button_stop_clicked(self):
-        self.status_bar.showMessage('stream stopped..')
+        self.status_bar.showMessage('Stream stopped..')
         # enable gui elements
         self.label_no_camera.setHidden(False)
         self.label_stream.setHidden(True)
@@ -136,7 +136,7 @@ class Application(QMainWindow):
         # stop camera thread
         self.stop_worker_thread_camera()
         self.start_worker_thread_pause_screen()
-        self.status_bar.showMessage('idle')
+        self.status_bar.showMessage('Idle')
 
     # update combobox items with current available cameras
     def on_combobox_camera_list_changed(self):
@@ -157,7 +157,7 @@ class Application(QMainWindow):
 
     # update combobox items 
     def update_combobox_camera_list_items(self):
-        self.status_bar.showMessage('updating camera list..')
+        self.status_bar.showMessage('Updating camera list..')
         QtCore.QCoreApplication.processEvents()
         self.combobox_camera_list.currentTextChanged.disconnect(self.on_combobox_camera_list_changed)
         text = self.combobox_camera_list.currentText()
@@ -169,7 +169,6 @@ class Application(QMainWindow):
         if index >= 0:
             self.combobox_camera_list.setCurrentIndex(index)
         self.combobox_camera_list.currentTextChanged.connect(self.on_combobox_camera_list_changed)
-        self.status_bar.showMessage('idle')
 
     # draw bounding box on frame
     def draw_bounding_box(self, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2):
@@ -259,7 +258,7 @@ class Application(QMainWindow):
     # display frame to label_stream
     def draw_frame(self, img, fps, results):
         if self.flag_is_camera_thread_running:
-            self.status_bar.showMessage('getting camera stream..')
+            self.status_bar.showMessage('Getting camera stream..')
         QtCore.QCoreApplication.processEvents()
         class_name, confidence = None, None
         # convert to rgb format
@@ -319,19 +318,19 @@ class Application(QMainWindow):
             self.label_dim.setText("Image size: " + str(width) + "x" + str(height))
         # update fps label
         if fps is None:
-            self.label_fps.setText("FPS: -")
+            self.label_fps.setText("FPS: 0.00")
         else:
             self.label_fps.setText("FPS: {:.2f}".format(fps))
         # update detected class
         if class_name is None:
-            self.label_class_info.setText("Class: no class")
+            self.label_class_info.setText("Class: -")
         elif class_name == 0:
-            self.label_class_info.setText("Class: sitting_good")
+            self.label_class_info.setText("Class: 0")
         else:
-            self.label_class_info.setText("Class: sitting_bad")
+            self.label_class_info.setText("Class: 1")
         # update confidence
         if confidence is None:
-            self.label_conf.setText('Confidence: -')
+            self.label_conf.setText('Confidence: 0.00')
         else:
             self.label_conf.setText('Confidence: {:.2f}'.format(confidence))
 
@@ -380,10 +379,10 @@ style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
   <color name="primaryColor">#ffffff</color>
   <color name="primaryLightColor">#6e6d6d</color>
-  <color name="secondaryColor">#8f8f8f</color>
+  <color name="secondaryColor">#323844</color>
   <color name="secondaryLightColor">#4f5b62</color>
   <color name="secondaryDarkColor">#31363b</color>
-  <color name="primaryTextColor">#000000</color>
+  <color name="primaryTextColor">#ffffff</color>
   <color name="secondaryTextColor">#ffffff</color>
 </resources>'''
 
@@ -394,7 +393,7 @@ with tempfile.NamedTemporaryFile(suffix='.xml', delete=False) as tmp:
     tmp.write(style.encode('utf-8'))
     # Close the temporary file
     tmp.close()
-    apply_stylesheet(app, theme=tmp.name)
+    apply_stylesheet(app, theme=tmp.name, css_file='custom.css')
 os.unlink(tmp.name)
 window.show()
 sys.exit(app.exec())
