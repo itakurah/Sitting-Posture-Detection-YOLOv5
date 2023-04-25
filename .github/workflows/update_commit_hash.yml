@@ -1,24 +1,23 @@
-name: tag-commit
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
-  tag_commit:
+  build:
     runs-on: ubuntu-latest
+    env:
+      COMMIT_HASH: ${{ steps.commit_hash.outputs.commit_hash }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get commit hash
-        run: echo "::set-env name=COMMIT_HASH::$(git rev-parse --short HEAD)"
-      - name: Update commit hash file
-        run: sed -i "s/^.*$/'${{ env.COMMIT_HASH }}'/" commit_hash.txt
-      - name: Commit and tag
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -m "Tag commit with current commit hash" -a
-          git tag ${{ env.COMMIT_HASH }}
-          git push --follow-tags
+        id: commit_hash
+        run: echo "::set-output name=commit_hash::$(git rev-parse --short HEAD)"
+      - name: Update commit hash
+        run: echo ${{ steps.commit_hash.outputs.commit_hash }} > commit_hash.txt
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update commit hash
+          commit_options: '--author "GitHub Action <>"'
+          commit_files: |
+            commit_hash.txt
+          git_user_name: GitHub Action
+          git_user_email: action@github.com
+          branch: main
