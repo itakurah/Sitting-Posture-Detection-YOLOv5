@@ -1,10 +1,9 @@
 import time
 
-import cv2
 from PyQt5 import QtCore
 
-from load_model import Model
 from frame_helper import *
+from load_model import Model
 
 '''Thread class for handling the received frames
 '''
