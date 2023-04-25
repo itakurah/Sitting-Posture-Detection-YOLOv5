@@ -1,4 +1,4 @@
-name: Update Commit Hash
+name: tag-commit
 
 on:
   push:
@@ -6,23 +6,19 @@ on:
       - main
 
 jobs:
-  update_commit_hash:
+  tag_commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Get commit hash
         run: echo "::set-env name=COMMIT_HASH::$(git rev-parse --short HEAD)"
-
       - name: Update commit hash file
+        run: sed -i "s/^.*$/'${{ env.COMMIT_HASH }}'/" commit_hash.txt
+      - name: Commit and tag
         run: |
-          echo "'${{ steps.get_commit_hash.outputs.COMMIT_HASH }}'" > commit_hash.txt
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add commit_hash.txt
-          git commit -m "Update commit hash"
-          git push
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Tag commit with current commit hash" -a
+          git tag ${{ env.COMMIT_HASH }}
+          git push --follow-tags
