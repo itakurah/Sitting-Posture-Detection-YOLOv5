@@ -10,7 +10,10 @@ from worker_thread_system_resource import WorkerThreadSystemResource
 '''Class for creating the application view
 '''
 
-
+COMMIT = ''
+# read current commit hash
+with open('commit_hash.txt', 'r') as file:
+    COMMIT = file.read()
 def load(self):
     """
     Loads the gui components
@@ -18,7 +21,7 @@ def load(self):
     # window properties
     self.gui_width = 870
     self.gui_height = 540
-    self.setWindowTitle("YOLO Sitting Posture Detector")
+    self.setWindowTitle("YOLO Sitting Posture Detector (commit: {})".format(COMMIT))
     self.setGeometry(100, 100, self.gui_width, self.gui_height)
     self.setFixedSize(self.gui_width, self.gui_height)
 
