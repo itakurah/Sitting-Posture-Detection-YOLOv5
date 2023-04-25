@@ -1,6 +1,6 @@
 # Posture Detector using YOLOv5
 
-![Product Name Screen Shot][product-screenshot]  
+<img src="https://github.com/itakurah/SittingPostureDetection/raw/main/images/screenshot.png" width=80% height=80%>
 
 This GitHub repository contains a posture detection program that utilizes YOLOv5, an advanced object detection algorithm, to detect and predict sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
 
@@ -55,8 +55,6 @@ and Jan Schwarzer as part of the "Train Like A Machine" module.
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-<!-- MARKDOWN LINKS & IMAGES -->  
-
-[product-screenshot]: images/screenshot.png
+<!-- MARKDOWN LINKS & IMAGES -->
 
 [Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
