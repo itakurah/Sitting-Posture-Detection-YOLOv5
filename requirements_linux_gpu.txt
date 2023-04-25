@@ -1,0 +1,12 @@
+torch==2.0.0
+torchaudio==2.0.1+cu117
+torchvision==0.15.1
+-f https://download.pytorch.org/whl/torch_stable.html
+numpy==1.24.2
+opencv-python-headless==4.7.0.72
+PyQt5==5.15.9
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.11.1
+PyQt5-stubs==5.15.6.0
+qt-material==2.14
+yolov5==7.0.11
