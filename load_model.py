@@ -26,12 +26,14 @@ class Model:
             self.model = yolov5.load(str(self.model_path), device=str(cuda))
         else:
             self.model = yolov5.load(str(self.model_path), device='cpu')
-        # model settings
-        self.model.label_conf = 0.70  # NMS confidence threshold
+        # model properties
+        self.model.conf = 0.30  # NMS confidence threshold
         self.model.iou = 0.80  # NMS IoU threshold
+        self.model.classes = [0, 1]  # Only show these classes
         self.model.agnostic = False  # NMS class-agnostic
         self.model.multi_label = False  # NMS multiple labels per box
         self.model.max_det = 1  # maximum number of detections per image
+        self.model.amp = True  # Automatic Mixed Precision (AMP) inference
 
     # return prediction
     def predict(self, image):
