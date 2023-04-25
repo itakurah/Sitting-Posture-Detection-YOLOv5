@@ -12,12 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get short commit hash
-        run: echo "::set-output name=commit_hash::$(git log -1 --format=%h)"
+      - name: Get commit hash
+        run: echo "::set-env name=COMMIT_HASH::$(git rev-parse --short HEAD)"
 
       - name: Update commit hash file
         run: |
-          echo "'${{ steps.get_commit_hash.outputs.commit_hash }}'" > commit_hash.txt
+          echo "'${{ steps.get_commit_hash.outputs.COMMIT_HASH }}'" > commit_hash.txt
 
       - name: Commit and push changes
         run: |
