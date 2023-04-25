@@ -1,0 +1,18 @@
+Application {{
+    background-color: #282c34;
+}}
+
+QGroupBox::title{{
+    padding-top:  8px;
+    padding-left: 8px;
+    color: white;
+}}
+
+QSlider::add-page:horizontal{{
+    background: gray;
+}}
+
+QSlider::sub-page:horizontal {{
+    background: gray;
+}}
+
