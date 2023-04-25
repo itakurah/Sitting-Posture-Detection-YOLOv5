@@ -21,7 +21,7 @@ def load(self):
     # window properties
     self.gui_width = 870
     self.gui_height = 540
-    self.setWindowTitle("YOLO Sitting Posture Detector (commit: {})".format(COMMIT))
+    self.setWindowTitle("Sitting Posture Detector (commit {})".format(COMMIT))
     self.setGeometry(100, 100, self.gui_width, self.gui_height)
     self.setFixedSize(self.gui_width, self.gui_height)
 
