@@ -25,23 +25,26 @@ Key Features:
 
 * Python 3.9.x
 
-### Installation
+### Installation  
+If you have an NVIDIA graphics processor, you can activate GPU acceleration by installing the GPU requirements. Note that without GPU acceleration, the inference will run on the CPU, which can be very slow.  
+#### Windows  
+  
+1. `git clone https://github.com/itakurah/SittingPostureDetection.git`  
+2. `python -m venv venv`  
+3. `.\venv\scripts\activate.bat`  
+##### Default/NVIDIA GPU support:  
+4.  `pip install -r ./requirements_windows.txt` **OR** `pip install -r ./requirements_windows_gpu.txt`
 
-#### Windows
-
-1. `git clone https://github.com/itakurah/SittingPostureDetection.git`
-2. `python -m venv venv`
-3. `.\venv\scripts\activate.bat`
-4. `pip install -r ./requirements_windows.txt`
-
-#### Linux
-
-1. `git clone https://github.com/itakurah/SittingPostureDetection.git`
-2. `python3 -m venv venv`
+#### Linux  
+  
+1. `git clone https://github.com/itakurah/SittingPostureDetection.git`  
+2. `python3 -m venv venv`  
 3. `source venv/bin/activate`
-4. `pip3 install -r requirements_linux.txt`
+##### Default/NVIDIA GPU support:  
+4. `pip3 install -r requirements_linux.txt` **OR** `pip3 install -r requirements_linux_gpu.txt`
 
-### How to run the program
+
+### Run the program
 
 `python application.py`
 
