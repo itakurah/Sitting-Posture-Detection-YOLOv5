@@ -6,7 +6,7 @@ import yolov5
 '''Class for loading the Yolo-v5 model
 '''
 
-MODEL_NAME = 'modelv5.pt'
+MODEL_NAME = 'model_l_best.pt'
 
 
 class Model:
@@ -27,7 +27,7 @@ class Model:
         else:
             self.model = yolov5.load(str(self.model_path), device='cpu')
         # model properties
-        self.model.conf = 0.30  # NMS confidence threshold
+        self.model.conf = 0.50  # NMS confidence threshold
         self.model.iou = 0.80  # NMS IoU threshold
         self.model.classes = [0, 1]  # Only show these classes
         self.model.agnostic = False  # NMS class-agnostic
