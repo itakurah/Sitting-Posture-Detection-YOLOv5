@@ -16,3 +16,7 @@ QSlider::sub-page:horizontal {{
     background: gray;
 }}
 
+QComboBox {{
+    font-weight: bold;
+}}
+
