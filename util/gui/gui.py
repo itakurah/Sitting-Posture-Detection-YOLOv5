@@ -3,17 +3,19 @@ from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioButton, QButtonGroup, QCheckBox, \
     QStatusBar, QDesktopWidget, QColorDialog, QSlider, QWidget
 
-from camera_helper import get_connected_camera_alias
-from worker_thread_pause_screen import WorkerThreadPauseScreen
-from worker_thread_system_resource import WorkerThreadSystemResource
+from util.helper.camera_helper import get_connected_camera_alias
+from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
+from util.threads.worker_thread_system_resource import WorkerThreadSystemResource
 
 '''Class for creating the application view
 '''
 
 COMMIT = ''
 # read current commit hash
-with open('commit_hash.txt', 'r') as file:
+with open('./commit_hash.txt', 'r') as file:
     COMMIT = file.read()
+
+
 def load(self):
     """
     Loads the gui components
@@ -142,12 +144,14 @@ def load(self):
     self.status_bar.addPermanentWidget(self.label_memory_usage)
     self.label_cpu_usage = QLabel('CPU: -')
     self.status_bar.addPermanentWidget(self.label_cpu_usage)
-    self.status_bar.showMessage('Idle')
+    #self.status_bar.showMessage('Idle')
 
     # create timer for buttons
     self.timer_start = QTimer()
     self.timer_stop = QTimer()
     self.timer_statusbar_idle = QTimer()
+    self.last_update_time = QDateTime.currentDateTime()
+    self.status_bar.messageChanged.connect(lambda: update_last_update_time(self))
     self.timer_statusbar_idle.timeout.connect(lambda: check_idle_time(self))
     self.timer_statusbar_idle.start(2000)
 
@@ -275,8 +279,7 @@ def load(self):
                                              'QPushButton:enabled {'
                                              'background-color: #4269b9;'
                                              'border: 1px solid white;}')
-    #self.button_color_box.setStyleSheet('border: 1px solid black')
-
+    # self.button_color_box.setStyleSheet('border: 1px solid black')
 
 
 # on timeout stop button
@@ -352,14 +355,18 @@ def update_slider_text(control, label):
     label.setText(str(control.value()) + '%')
 
 
+def update_last_update_time(self):
+    self.last_update_time = QDateTime.currentDateTime()
+
+
 def check_idle_time(self):
     if self.status_bar.currentMessage() == "Idle":
         return
 
-    last_msg_time = self.status_bar.property("last_msg_time")
-    if last_msg_time is None:
-        return
-
-    elapsed_time = QDateTime.currentDateTime().toSecsSinceEpoch() - last_msg_time
-    if elapsed_time >= 1 & (not self.status_bar.currentMessage() == "Getting camera stream.."):
+    current_time = QDateTime.currentDateTime()
+    if self.last_update_time.msecsTo(current_time) >= 1000:
         self.status_bar.showMessage("Idle")
+
+
+def set_border_color(label, color):
+    label.setStyleSheet("border: 4px solid {}".format(color))
