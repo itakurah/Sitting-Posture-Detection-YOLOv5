@@ -6,7 +6,7 @@ import yolov5
 '''Class for loading the Yolo-v5 model
 '''
 
-MODEL_NAME = 'model_s_e499_i315_0_162_1_153_best.pt'
+MODEL_NAME = 'model_s_best.pt'
 
 
 class Model:
