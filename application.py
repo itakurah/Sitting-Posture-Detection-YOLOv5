@@ -10,13 +10,11 @@ from PyQt5.QtGui import QPixmap, QImage, QColor, QPainter
 from PyQt5.QtWidgets import *
 from qt_material import apply_stylesheet
 
-import camera_helper
-import frame_helper
-import frame_properties
-import gui
-from load_model import Model
-from worker_thread_frame import WorkerThreadFrame
-from worker_thread_pause_screen import WorkerThreadPauseScreen
+from util.gui import gui, frame_properties
+from util.helper import camera_helper, frame_helper
+from util.helper.load_model import Model
+from util.threads.worker_thread_frame import WorkerThreadFrame
+from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
 class Application(QMainWindow):
@@ -136,7 +134,6 @@ class Application(QMainWindow):
         # stop camera thread
         self.stop_worker_thread_camera()
         self.start_worker_thread_pause_screen()
-        self.status_bar.showMessage('Idle')
 
     # update combobox items with current available cameras
     def on_combobox_camera_list_changed(self):
@@ -246,9 +243,9 @@ class Application(QMainWindow):
                         self.text_font,
                         self.text_font_scale, self.text_color_class, self.text_thickness, cv2.LINE_AA)
         if class_name == 0:
-            self.label_stream.setStyleSheet("border: 2px solid {}".format('green'))
+            gui.set_border_color(self.label_stream, 'green')
         else:
-            self.label_stream.setStyleSheet("border: 2px solid {}".format('red'))
+            gui.set_border_color(self.label_stream, 'red')
 
     # draw items on frame
     def draw_items(self, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
@@ -277,7 +274,7 @@ class Application(QMainWindow):
             (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = Model.get_results(results)
             self.draw_items(frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence)
         else:
-            self.label_stream.setStyleSheet("border: 2px solid black")
+            gui.set_border_color(self.label_stream, 'black')
         # convert frame to QPixmap format
         bytes_per_line = 3 * width
         q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
@@ -393,7 +390,7 @@ with tempfile.NamedTemporaryFile(suffix='.xml', delete=False) as tmp:
     tmp.write(style.encode('utf-8'))
     # Close the temporary file
     tmp.close()
-    apply_stylesheet(app, theme=tmp.name, css_file='custom.css')
+    apply_stylesheet(app, theme=tmp.name, css_file='util/gui/custom.css')
 os.unlink(tmp.name)
 window.show()
 sys.exit(app.exec())
