@@ -1,5 +1,6 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QSize
 from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioButton, QButtonGroup, QCheckBox, \
     QStatusBar, QDesktopWidget, QColorDialog, QSlider, QWidget
 
@@ -50,6 +51,16 @@ def load(self):
     self.label_stream.setFixedHeight(self.label_stream_height)
     self.label_stream.move(combobox_camera_list_x, combobox_camera_list_y + 30)
     self.label_stream.setHidden(True)
+
+    # fullscreen button
+    self.button_fullscreen = QPushButton('', self.label_stream)
+    self.button_fullscreen.move(self.label_stream.width()-45, self.label_stream.height()-45)
+    self.button_fullscreen.setFixedWidth(45)
+    self.button_fullscreen.setFixedHeight(45)
+    self.button_fullscreen.setIcon(QIcon("images/fullscreen_icon.png"))
+    self.button_fullscreen.setIconSize(QSize(25, 25))
+    self.button_fullscreen.setStyleSheet("background-color: transparent;border: none;")
+    self.button_fullscreen.clicked.connect(self.enable_fullscreen)
 
     # image label properties
     self.label_no_camera = QLabel(self)

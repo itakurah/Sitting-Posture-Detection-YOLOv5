@@ -12,6 +12,7 @@ from qt_material import apply_stylesheet
 
 from util.gui import gui, frame_properties
 from util.helper import camera_helper, frame_helper
+from util.helper.fullscreen_helper import FullscreenWindow
 from util.helper.load_model import Model
 from util.threads.worker_thread_frame import WorkerThreadFrame
 from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
@@ -22,6 +23,9 @@ class Application(QMainWindow):
     def __init__(self):
         super().__init__()
         # annotate class variables
+        self.is_fullscreen = False
+        self.fullscreen_window = None
+        self.pixmap = None
         self.worker_thread_pause_screen = None
         self.worker_thread_memory = None
         self.label_stream_height = None
@@ -80,6 +84,15 @@ class Application(QMainWindow):
         frame_properties.load(self)
         # load gui
         gui.load(self)
+
+    def enable_fullscreen(self):
+        self.fullscreen_window = FullscreenWindow()
+        self.fullscreen_window.fullscreen_closed.connect(self.on_fullscreen_closed)
+        self.is_fullscreen = True
+        self.fullscreen_window.showFullScreen()
+
+    def on_fullscreen_closed(self):
+        self.is_fullscreen = False
 
     # update memory and cpu usage in statusbar
     def update_system_resource(self):
@@ -278,14 +291,17 @@ class Application(QMainWindow):
         # convert frame to QPixmap format
         bytes_per_line = 3 * width
         q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(q_image)
+        self.pixmap = QPixmap.fromImage(q_image)
         # add border to frame
-        pixmap = self.draw_black_border(pixmap)
+        self.pixmap = self.draw_black_border(self.pixmap)
         if self.flag_is_camera_thread_running:
             self.update_statusbar(height, width, fps, class_name, confidence)
         else:
             self.update_statusbar()
-        self.label_stream.setPixmap(QPixmap.fromImage(pixmap))
+        if self.is_fullscreen:
+            self.fullscreen_window.set_central_widget_content(self.pixmap)
+        else:
+            self.label_stream.setPixmap(QPixmap.fromImage(self.pixmap))
         self.label_stream.adjustSize()
         self.label_stream.update()
 
