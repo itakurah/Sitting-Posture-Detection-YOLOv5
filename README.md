@@ -46,7 +46,7 @@ If you have an NVIDIA graphics processor, you can activate GPU acceleration by i
 
 ### Run the program
 
-`python application.py`
+`python application.py <optional: model_file.pt>`
 
 # About
 
