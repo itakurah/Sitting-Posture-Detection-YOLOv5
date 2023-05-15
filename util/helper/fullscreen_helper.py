@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QPainter
 from PyQt5.QtWidgets import QLabel, QMainWindow
 
 
@@ -9,6 +9,7 @@ class FullscreenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel()
+        self.label.setStyleSheet("background-color: black;")
         self.label.setAlignment(Qt.AlignCenter)
         self.setWindowState(Qt.WindowFullScreen)
 

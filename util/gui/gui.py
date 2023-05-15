@@ -44,7 +44,7 @@ def load(self):
 
     # image label properties
     self.label_stream = QLabel(self)
-    self.label_stream.setStyleSheet("border: 2px solid black")
+    self.label_stream.setStyleSheet("border: 2px solid black; background-color: black;")
     self.label_stream_width = 600
     self.label_stream_height = 450
     self.label_stream.setFixedWidth(self.label_stream_width)
