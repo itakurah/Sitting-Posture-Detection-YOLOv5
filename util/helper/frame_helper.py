@@ -17,18 +17,20 @@ def change_contrast(image, contrast_factor):
     Returns:
         numpy array: The image with adjusted contrast.
     """
-    # Convert the image to float32 for arithmetic operations
-    image = image.astype('float32')
+    try:
+        # Convert the image to float32 for arithmetic operations
+        image = image.astype('float32')
+        # Apply the contrast formula
+        output = (image - 128) * contrast_factor + 128
 
-    # Apply the contrast formula
-    output = (image - 128) * contrast_factor + 128
+        # Clip the values to the range [0, 255]
+        output = np.clip(output, 0, 255)
 
-    # Clip the values to the range [0, 255]
-    output = np.clip(output, 0, 255)
-
-    # Convert the image back to uint8 data type
-    output = output.astype('uint8')
-
+        # Convert the image back to uint8 data type
+        output = output.astype('uint8')
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
     return output
 
 
@@ -44,15 +46,18 @@ def change_brightness(image, brightness_factor):
     Returns:
         numpy array: The image with adjusted brightness.
     """
-    # Scale the image by the brightness factor
-    output = image * brightness_factor
+    try:
+        # Scale the image by the brightness factor
+        output = image * brightness_factor
 
-    # Clip the values to the range [0, 255]
-    output = np.clip(output, 0, 255)
+        # Clip the values to the range [0, 255]
+        output = np.clip(output, 0, 255)
 
-    # Convert the image back to uint8 data type
-    output = output.astype('uint8')
-
+        # Convert the image back to uint8 data type
+        output = output.astype('uint8')
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
     return output
 
 
