@@ -366,7 +366,8 @@ class Application(QMainWindow):
 
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
-        self.work_thread_camera = WorkerThreadFrame(self.model, self.camera_mapping.get(current_item), self.slider_brightness,
+        self.work_thread_camera = WorkerThreadFrame(self.model, self.camera_mapping.get(current_item),
+                                                    self.slider_brightness,
                                                     self.slider_contrast)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
@@ -404,11 +405,14 @@ style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
   <color name="secondaryTextColor">#ffffff</color>
 </resources>'''
 
-if len(sys.argv) != 2:
-    print("Error: Exactly one argument is expected.")
+if len(sys.argv) > 2:
+    print("Error: Exactly one argument is expected")
     sys.exit(1)
-
-model_name = sys.argv[1]
+elif len(sys.argv) == 1:
+    print("Info: Loading default model")
+    model_name = "model_s_best.pt"
+else:
+    model_name = sys.argv[1]
 
 app = QApplication([])
 window = Application()
