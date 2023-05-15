@@ -54,7 +54,7 @@ def load(self):
 
     # fullscreen button
     self.button_fullscreen = QPushButton('', self.label_stream)
-    self.button_fullscreen.move(self.label_stream.width()-45, self.label_stream.height()-45)
+    self.button_fullscreen.move(self.label_stream.width() - 45, self.label_stream.height() - 45)
     self.button_fullscreen.setFixedWidth(45)
     self.button_fullscreen.setFixedHeight(45)
     self.button_fullscreen.setIcon(QIcon("images/fullscreen_icon.png"))
@@ -155,7 +155,7 @@ def load(self):
     self.status_bar.addPermanentWidget(self.label_memory_usage)
     self.label_cpu_usage = QLabel('CPU: -')
     self.status_bar.addPermanentWidget(self.label_cpu_usage)
-    #self.status_bar.showMessage('Idle')
+    # self.status_bar.showMessage('Idle')
 
     # create timer for buttons
     self.timer_start = QTimer()
