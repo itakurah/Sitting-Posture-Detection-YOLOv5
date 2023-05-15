@@ -73,6 +73,7 @@ class Application(QMainWindow):
         self.height = None
         self.fps = None
 
+        self.model = Model(get_model_name())
         self.prev_frame_time = 0
         self.IMAGE_BOX_SIZE = 600
         self.flag_is_camera_thread_running = True
@@ -365,7 +366,7 @@ class Application(QMainWindow):
 
     # initialize worker thread for camera capture
     def start_worker_thread_camera(self, current_item):
-        self.work_thread_camera = WorkerThreadFrame(self.camera_mapping.get(current_item), self.slider_brightness,
+        self.work_thread_camera = WorkerThreadFrame(self.model, self.camera_mapping.get(current_item), self.slider_brightness,
                                                     self.slider_contrast)
         self.work_thread_camera.update_camera.connect(self.draw_frame)
         self.work_thread_camera.start()
@@ -388,6 +389,10 @@ class Application(QMainWindow):
         self.worker_thread_memory.stop()
 
 
+def get_model_name():
+    return model_name
+
+
 style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
   <color name="primaryColor">#ffffff</color>
@@ -398,6 +403,12 @@ style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
   <color name="primaryTextColor">#ffffff</color>
   <color name="secondaryTextColor">#ffffff</color>
 </resources>'''
+
+if len(sys.argv) != 2:
+    print("Error: Exactly one argument is expected.")
+    sys.exit(1)
+
+model_name = sys.argv[1]
 
 app = QApplication([])
 window = Application()
