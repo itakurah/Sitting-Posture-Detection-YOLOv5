@@ -1,3 +1,6 @@
+import sys
+
+from PyQt5 import QtGui
 from PyQt5.QtCore import QTimer, QSize
 from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtGui import QIcon
@@ -27,6 +30,15 @@ def load(self):
     self.setWindowTitle("Sitting Posture Detector (commit {})".format(COMMIT))
     self.setGeometry(100, 100, self.gui_width, self.gui_height)
     self.setFixedSize(self.gui_width, self.gui_height)
+
+    # Set icon
+    self.setWindowIcon(QtGui.QIcon('images/logo.png'))
+    # Set taskbar icon in Windows
+    if sys.platform.startswith('win'):
+        import ctypes
+        # Specify app name
+        id = '{}'.format(COMMIT)
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(id)
 
     # centers the window
     center_window(self)
