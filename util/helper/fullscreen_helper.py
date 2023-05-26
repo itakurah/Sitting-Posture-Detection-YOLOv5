@@ -9,7 +9,7 @@ class FullscreenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel()
-        self.label.setStyleSheet("background-color: black;")
+        self.label.setStyleSheet('background-color: black;')
         self.label.setAlignment(Qt.AlignCenter)
         self.setWindowState(Qt.WindowFullScreen)
 
