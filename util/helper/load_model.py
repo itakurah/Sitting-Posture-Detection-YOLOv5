@@ -12,11 +12,11 @@ MODEL_NAME = 'model_s_best.pt'
 class Model:
     def __init__(self, model_name):
         # path to model
-        self.model_path = Path("./model/{}".format(model_name))
-        print(model_name + " loaded")
-        print("cuda available: " + str(torch.cuda.is_available()))
+        self.model_path = Path('./model/{}'.format(model_name))
+        print(model_name + ' loaded')
+        print('cuda available: ' + str(torch.cuda.is_available()))
         if torch.cuda.is_available():
-            print("running GPU inference..")
+            print('running GPU inference..')
             device_memory = {}
             # get gpu with the highest memory
             for i in range(torch.cuda.device_count()):
@@ -28,13 +28,13 @@ class Model:
             try:
                 self.model = yolov5.load(str(self.model_path), device=str(cuda))
             except Exception:
-                print("Model not found")
+                print('Model not found')
         else:
-            print("running CPU inference..")
+            print('running CPU inference..')
             try:
                 self.model = yolov5.load(str(self.model_path), device='cpu')
             except Exception:
-                print("Model not found")
+                print('Model not found')
         # model properties
         self.model.conf = 0.50  # NMS confidence threshold
         self.model.iou = 0.80  # NMS IoU threshold
