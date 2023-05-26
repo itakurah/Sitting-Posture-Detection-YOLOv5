@@ -210,7 +210,6 @@ def load(self):
     self.status_bar.addPermanentWidget(self.label_memory_usage)
     self.label_cpu_usage = QLabel('CPU: -')
     self.status_bar.addPermanentWidget(self.label_cpu_usage)
-    # self.status_bar.showMessage('Idle')
 
     # create timer for buttons
     self.timer_start = QTimer()
