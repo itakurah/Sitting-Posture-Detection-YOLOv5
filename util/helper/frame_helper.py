@@ -29,7 +29,7 @@ def change_contrast(image, contrast_factor):
         # Convert the image back to uint8 data type
         output = output.astype('uint8')
     except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+        print(f'Unexpected {err=}, {type(err)=}')
         raise
     return output
 
@@ -56,7 +56,7 @@ def change_brightness(image, brightness_factor):
         # Convert the image back to uint8 data type
         output = output.astype('uint8')
     except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+        print(f'Unexpected {err=}, {type(err)=}')
         raise
     return output
 
