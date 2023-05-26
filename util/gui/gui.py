@@ -27,7 +27,7 @@ def load(self):
     # window properties
     self.gui_width = 870
     self.gui_height = 540
-    self.setWindowTitle("Sitting Posture Detector (commit {})".format(COMMIT))
+    self.setWindowTitle('Sitting Posture Detector (commit {})'.format(COMMIT))
     self.setGeometry(100, 100, self.gui_width, self.gui_height)
     self.setFixedSize(self.gui_width, self.gui_height)
 
@@ -56,7 +56,7 @@ def load(self):
 
     # image label properties
     self.label_stream = QLabel(self)
-    self.label_stream.setStyleSheet("border: 2px solid black; background-color: black;")
+    self.label_stream.setStyleSheet('border: 2px solid black; background-color: black;')
     self.label_stream_width = 600
     self.label_stream_height = 450
     self.label_stream.setFixedWidth(self.label_stream_width)
@@ -69,14 +69,14 @@ def load(self):
     self.button_fullscreen.move(self.label_stream.width() - 45, self.label_stream.height() - 45)
     self.button_fullscreen.setFixedWidth(45)
     self.button_fullscreen.setFixedHeight(45)
-    self.button_fullscreen.setIcon(QIcon("images/fullscreen_icon.png"))
+    self.button_fullscreen.setToolTip('Enable/Disable fullscreen')
+    self.button_fullscreen.setIcon(QIcon('images/fullscreen_icon.png'))
     self.button_fullscreen.setIconSize(QSize(25, 25))
-    self.button_fullscreen.setStyleSheet("background-color: transparent;border: none;")
     self.button_fullscreen.clicked.connect(self.enable_fullscreen)
 
     # image label properties
     self.label_no_camera = QLabel(self)
-    self.label_no_camera.setStyleSheet("border: 0px solid black")
+    self.label_no_camera.setStyleSheet('border: 0px solid black')
     self.label_no_camera.setFixedWidth(self.label_stream_width)
     self.label_no_camera.setFixedHeight(self.label_stream_height)
     self.label_no_camera.move(combobox_camera_list_x, combobox_camera_list_y + 30)
@@ -87,12 +87,7 @@ def load(self):
     button_start_x = combobox_camera_list_x + combobox_camera_list_width + 5
     button_start_y = 50
     self.button_start = QPushButton('Start', self)
-    self.button_start.setStyleSheet('QPushButton:enabled {'
-                                    'background-color: #4269b9;'
-                                    'border: 1px solid white;}'
-                                    'QPushButton:disabled,'
-                                    'QPushButton:disabled:hover {'
-                                    'background-color: #323844;}')
+    self.button_start.setToolTip('Start camera stream')
     self.button_start.setFixedHeight(button_start_height)
     self.button_start.setFixedWidth(button_start_width)
     self.button_start.move(button_start_x, combobox_camera_list_y - 1)
@@ -101,49 +96,97 @@ def load(self):
     button_stop_x = button_start_width + button_start_x + 5
     button_stop_y = 50
     self.button_stop = QPushButton('Stop', self)
-    self.button_stop.setStyleSheet('QPushButton:enabled {'
-                                   'background-color: #4269b9;'
-                                   'border: 1px solid white;}'
-                                   'QPushButton:disabled,'
-                                   'QPushButton:disabled:hover {'
-                                   'background-color: #323844;}')
+    self.button_stop.setToolTip('Stop camera stream')
     self.button_stop.setFixedHeight(27)
     self.button_stop.setFixedWidth(80)
     self.button_stop.move(button_stop_x, combobox_camera_list_y - 1)
 
     # groupbox properties
     self.groupbox_frame_options = QGroupBox(self)
-    self.groupbox_frame_options.setTitle('Frame Options')
-    self.groupbox_frame_options.setFixedHeight(340)
+    self.groupbox_frame_options.setTitle('General Options')
+    self.groupbox_frame_options.setFixedHeight(self.label_stream_height)
     self.groupbox_frame_options.setFixedWidth(230)
     self.groupbox_frame_options.move(630, 50)
+
+    # flip horizontal button
+    self.button_flip_horizontal = QPushButton('', self.groupbox_frame_options)
+    self.button_flip_horizontal.move(10, 355)
+    self.button_flip_horizontal.setToolTip('Flip image horizontal')
+    self.button_flip_horizontal.setFixedWidth(28)
+    self.button_flip_horizontal.setFixedHeight(28)
+    self.button_flip_horizontal.setIcon(QIcon('images/flip_horizontal.png'))
+    self.button_flip_horizontal.setIconSize(QSize(25, 25))
+    self.button_flip_horizontal.pressed.connect(lambda: on_button_pressed(self.button_flip_horizontal, 'images'
+                                                                                                       '/flip_horizontal_pressed'
+                                                                                                       '.png'))
+    self.button_flip_horizontal.released.connect(lambda: on_button_released(self.button_flip_horizontal, 'images'
+                                                                                                         '/flip_horizontal'
+                                                                                                         '.png'))
+
+    # flip vertical button
+    self.button_flip_vertical = QPushButton('', self.groupbox_frame_options)
+    self.button_flip_vertical.move(45, 355)
+    self.button_flip_vertical.setToolTip('Flip image vertical')
+    self.button_flip_vertical.setFixedWidth(28)
+    self.button_flip_vertical.setFixedHeight(28)
+    self.button_flip_vertical.setIcon(QIcon('images/flip_vertical.png'))
+    self.button_flip_vertical.setIconSize(QSize(25, 25))
+    self.button_flip_vertical.pressed.connect(lambda: on_button_pressed(self.button_flip_vertical, 'images'
+                                                                                                   '/flip_vertical_pressed'
+                                                                                                   '.png'))
+    self.button_flip_vertical.released.connect(lambda: on_button_released(self.button_flip_vertical, 'images'
+                                                                                                     '/flip_vertical'
+                                                                                                     '.png'))
+
+    # rotate button
+    self.button_rotate = QPushButton('', self.groupbox_frame_options)
+    self.button_rotate.move(80, 355)
+    self.button_rotate.setToolTip('Rotate image by 90 degrees')
+    self.button_rotate.setFixedWidth(28)
+    self.button_rotate.setFixedHeight(28)
+    self.button_rotate.setIcon(QIcon('images/rotate.png'))
+    self.button_rotate.setIconSize(QSize(25, 25))
+    self.button_rotate.pressed.connect(lambda: on_button_pressed(self.button_rotate, 'images'
+                                                                                     '/rotate_pressed'
+                                                                                     '.png'))
+    self.button_rotate.released.connect(lambda: on_button_released(self.button_rotate, 'images'
+                                                                                       '/rotate'
+                                                                                       '.png'))
 
     # radio buttons properties
     self.current_rb_selected = None
     self.button_group = QButtonGroup(self)
-    self.rb_1 = QRadioButton('Bottom-left', self.groupbox_frame_options)
-    self.rb_1.move(10, 60)
-    self.rb_2 = QRadioButton('Bottom-right', self.groupbox_frame_options)
-    self.rb_2.move(110, 60)
-    self.rb_3 = QRadioButton('Top-left', self.groupbox_frame_options)
-    self.rb_3.move(10, 30)
-    self.rb_4 = QRadioButton('Top-right', self.groupbox_frame_options)
-    self.rb_4.move(110, 30)
-    self.rb_1.setChecked(True)
-    self.button_group.addButton(self.rb_1, 1)
-    self.button_group.addButton(self.rb_2, 2)
-    self.button_group.addButton(self.rb_3, 3)
-    self.button_group.addButton(self.rb_4, 4)
+    self.radiobutton_bl = QRadioButton('Bottom-left', self.groupbox_frame_options)
+    self.radiobutton_bl.move(10, 65)
+    self.radiobutton_bl.setToolTip('Displays information in the bottom-left corner')
+    self.radiobutton_br = QRadioButton('Bottom-right', self.groupbox_frame_options)
+    self.radiobutton_br.move(110, 65)
+    self.radiobutton_br.setToolTip('Displays information in the bottom-right corner')
+    self.radiobutton_tl = QRadioButton('Top-left', self.groupbox_frame_options)
+    self.radiobutton_tl.move(10, 30)
+    self.radiobutton_tl.setToolTip('Displays information in the top-left corner')
+    self.radiobutton_tr = QRadioButton('Top-right', self.groupbox_frame_options)
+    self.radiobutton_tr.move(110, 30)
+    self.radiobutton_tr.setToolTip('Displays information in the top-right corner')
+    self.radiobutton_bl.setChecked(True)
+    self.button_group.addButton(self.radiobutton_bl, 1)
+    self.button_group.addButton(self.radiobutton_br, 2)
+    self.button_group.addButton(self.radiobutton_tl, 3)
+    self.button_group.addButton(self.radiobutton_tr, 4)
 
     # checkbox properties
     self.cbox_enable_bbox = QCheckBox('Bounding Box', self.groupbox_frame_options)
     self.cbox_enable_bbox.move(10, 110)
+    self.cbox_enable_bbox.setToolTip('Enable/Disable bounding box')
     self.cbox_enable_class = QCheckBox('Class', self.groupbox_frame_options)
     self.cbox_enable_class.move(10, 170)
+    self.cbox_enable_class.setToolTip('Enable/Disable class name')
     self.cbox_enable_conf = QCheckBox('Confidence', self.groupbox_frame_options)
     self.cbox_enable_conf.move(10, 140)
+    self.cbox_enable_conf.setToolTip('Enable/Disable confidence score')
     self.cbox_enable_info_background = QCheckBox('Background', self.groupbox_frame_options)
     self.cbox_enable_info_background.move(10, 200)
+    self.cbox_enable_info_background.setToolTip('Enable/Disable background box')
     self.cbox_enable_bbox.setChecked(True)
     self.cbox_enable_class.setChecked(True)
     self.cbox_enable_conf.setChecked(True)
@@ -152,16 +195,16 @@ def load(self):
     # statusbar properties
     self.status_bar = QStatusBar()
     self.status_bar.setSizeGripEnabled(False)
-    self.status_bar.setProperty("last_msg_time", QDateTime.currentDateTime().toSecsSinceEpoch())
+    self.status_bar.setProperty('last_msg_time', QDateTime.currentDateTime().toSecsSinceEpoch())
     self.status_bar.setStyleSheet('background-color: #3555a0;font-weight: bold;')
     self.setStatusBar(self.status_bar)
-    self.label_class_info = QLabel("Class: -")
+    self.label_class_info = QLabel('Class: -')
     self.status_bar.addPermanentWidget(self.label_class_info)
-    self.label_conf = QLabel("Confidence: 0.00")
+    self.label_conf = QLabel('Confidence: 0.00')
     self.status_bar.addPermanentWidget(self.label_conf)
-    self.label_dim = QLabel("Image size: -")
+    self.label_dim = QLabel('Image size: -')
     self.status_bar.addPermanentWidget(self.label_dim)
-    self.label_fps = QLabel("FPS: 0.00")
+    self.label_fps = QLabel('FPS: 0.00')
     self.status_bar.addPermanentWidget(self.label_fps)
     self.label_memory_usage = QLabel('Memory: -')
     self.status_bar.addPermanentWidget(self.label_memory_usage)
@@ -203,13 +246,9 @@ def load(self):
     self.button_color_bg.setStyleSheet(
         f"background-color: rgb({self.text_color_bg[0]}, {self.text_color_bg[1]}, {self.text_color_bg[2]});border: none")
 
-    self.groupbox_general_options = QGroupBox(self)
-    self.groupbox_general_options.setTitle('General Options')
-    self.groupbox_general_options.setFixedHeight(100)
-    self.groupbox_general_options.setFixedWidth(230)
-    self.groupbox_general_options.move(630, 400)
-    self.cbox_enable_debug = QCheckBox('Debug Info', self.groupbox_general_options)
-    self.cbox_enable_debug.move(10, 30)
+    self.cbox_enable_debug = QCheckBox('Debug Info', self.groupbox_frame_options)
+    self.cbox_enable_debug.move(10, 400)
+    self.cbox_enable_debug.setToolTip('Enable/Disable debug information in the status bar')
     self.cbox_enable_debug.setChecked(True)
     self.cbox_enable_debug.stateChanged.connect(self.set_debug_mode)
 
@@ -291,7 +330,7 @@ def load(self):
     for groupBox in self.findChildren(QGroupBox):
         for widget in groupBox.findChildren(QWidget):
             if not isinstance(widget, QPushButton):
-                widget.setStyleSheet("background-color: #323844;font-weight: bold;")
+                widget.setStyleSheet('background-color: #323844;font-weight: bold;')
     self.button_reset_brightness.setStyleSheet('QPushButton {'
                                                'font-size: 10px;}'
                                                'QPushButton:enabled {'
@@ -302,6 +341,46 @@ def load(self):
                                              'QPushButton:enabled {'
                                              'background-color: #4269b9;'
                                              'border: 1px solid white;}')
+    self.button_rotate.setStyleSheet('QPushButton {'
+                                     'font-size: 10px;}'
+                                     'QPushButton:enabled {'
+                                     'background-color: #4269b9;'
+                                     'border: 1px solid white;}'
+                                     'QToolTip {background-color: #323844; font-weight: bold; }')
+    self.button_flip_horizontal.setStyleSheet('QPushButton {'
+                                              'font-size: 10px;}'
+                                              'QPushButton:enabled {'
+                                              'background-color: #4269b9;'
+                                              'border: 1px solid white;}'
+                                              'QToolTip {background-color: #323844; font-weight: bold; }')
+    self.button_flip_vertical.setStyleSheet('QPushButton {'
+                                            'font-size: 10px;}'
+                                            'QPushButton:enabled {'
+                                            'background-color: #4269b9;'
+                                            'border: 1px solid white;}'
+                                            'QToolTip {background-color: #323844; font-weight: bold; }')
+    self.button_start.setStyleSheet('QPushButton:enabled {'
+                                    'background-color: #4269b9;'
+                                    'border: 1px solid white;}'
+                                    'QPushButton:disabled,'
+                                    'QPushButton:disabled:hover {'
+                                    'background-color: #323844;}'
+                                    'QToolTip {background-color: #323844;'
+                                    ' font-weight: bold; }')
+    self.button_stop.setStyleSheet('QPushButton:enabled {'
+                                   'background-color: #4269b9;'
+                                   'border: 1px solid white;}'
+                                   'QPushButton:disabled,'
+                                   'QPushButton:disabled:hover {'
+                                   'background-color: #323844;}'
+                                   'QToolTip {background-color: #323844;'
+                                   'font-weight: bold; }')
+    self.button_fullscreen.setStyleSheet('QPushButton:enabled {'
+                                         'background-color: transparent;'
+                                         'border: none;}'
+                                         'QToolTip {background-color: #323844;'
+                                         'font-weight: bold;'
+                                         'border: none}')
     # self.button_color_box.setStyleSheet('border: 1px solid black')
 
 
@@ -355,7 +434,7 @@ def show_color_picker(self, button):
         # update the color tuple with the new RGB values
         color_tuple = (color.red(), color.green(), color.blue())
         # set the background color of the button using stylesheet
-        button.setStyleSheet(f"background-color: rgb({color.red()}, {color.green()}, {color.blue()});border: none")
+        button.setStyleSheet(f'background-color: rgb({color.red()}, {color.green()}, {color.blue()});border: none')
         # update the original color tuple with the new RGB values
         if button == self.button_color_box:
             self.box_color = color_tuple
@@ -388,8 +467,16 @@ def check_idle_time(self):
 
     current_time = QDateTime.currentDateTime()
     if self.last_update_time.msecsTo(current_time) >= 1000:
-        self.status_bar.showMessage("Idle")
+        self.status_bar.showMessage('Idle')
 
 
 def set_border_color(label, color):
-    label.setStyleSheet("border: 4px solid {}".format(color))
+    label.setStyleSheet('border: 4px solid {}'.format(color))
+
+
+def on_button_pressed(button, path):
+    button.setIcon(QIcon(path))
+
+
+def on_button_released(button, path):
+    button.setIcon(QIcon(path))
