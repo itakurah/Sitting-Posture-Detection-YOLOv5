@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QMainWindow
 
 
-class FullscreenWindow(QMainWindow):
+class FullscreenView(QMainWindow):
     fullscreen_closed = pyqtSignal()
 
     def __init__(self):

@@ -11,7 +11,7 @@ from util.helper.camera_helper import get_connected_camera_alias
 from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 from util.threads.worker_thread_system_resource import WorkerThreadSystemResource
 
-'''Class for creating the application view
+'''Class for creating the application views
 '''
 
 COMMIT = ''
@@ -72,7 +72,7 @@ def load(self):
     self.button_fullscreen.setToolTip('Enable/Disable fullscreen')
     self.button_fullscreen.setIcon(QIcon('images/fullscreen_icon.png'))
     self.button_fullscreen.setIconSize(QSize(25, 25))
-    self.button_fullscreen.clicked.connect(self.enable_fullscreen)
+    #self.button_fullscreen.clicked.connect(self.show_fullscreen)
 
     # image label properties
     self.label_no_camera = QLabel(self)
@@ -249,7 +249,7 @@ def load(self):
     self.cbox_enable_debug.move(10, 400)
     self.cbox_enable_debug.setToolTip('Enable/Disable debug information in the status bar')
     self.cbox_enable_debug.setChecked(True)
-    self.cbox_enable_debug.stateChanged.connect(self.set_debug_mode)
+    #self.cbox_enable_debug.stateChanged.connect(self.set_debug_mode)
 
     # slider properties - brightness
     self.label_brightness_control = QLabel('Brightness:', self.groupbox_frame_options)
@@ -295,17 +295,17 @@ def load(self):
 
     # start memory thread
     self.worker_thread_memory = WorkerThreadSystemResource()
-    self.worker_thread_memory.update_memory.connect(self.update_system_resource)
+    #self.worker_thread_memory.update_memory.connect(self.update_system_resource)
     self.worker_thread_memory.start()
 
     # start pause screen thread
     self.worker_thread_pause_screen = WorkerThreadPauseScreen(self.label_stream_width, self.label_stream_height)
-    self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
+    #self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
     self.worker_thread_pause_screen.start()
 
     # register signals
-    self.combobox_camera_list.currentTextChanged.connect(self.on_combobox_camera_list_changed)
-    self.button_start.clicked.connect(self.on_button_start_clicked)
+    #self.combobox_camera_list.currentTextChanged.connect(self.on_combobox_camera_list_changed)
+    #self.button_start.clicked.connect(self.on_button_start_clicked)
     self.button_stop.clicked.connect(self.on_button_stop_clicked)
     self.timer_start.timeout.connect(lambda: timer_timeout_start(self))
     self.timer_stop.timeout.connect(lambda: timer_timeout_stop(self))
@@ -317,7 +317,7 @@ def load(self):
     self.button_reset_contrast.clicked.connect(lambda: self.slider_contrast.setValue(100))
 
     # load cbox items
-    self.update_combobox_camera_list_items()
+    #self.update_combobox_camera_list_items()
 
     # disable stop button on start
     self.button_stop.setEnabled(False)
@@ -445,15 +445,6 @@ def show_color_picker(self, button):
             self.text_color_bg = color_tuple
 
 
-def update_slider_text(control, label):
-    """
-    Updates the text of the QLabel besides the slider
-
-    Args:
-        control: the control object to read from.
-        label: the label to be updated.
-    """
-    label.setText(str(control.value()) + '%')
 
 
 def update_last_update_time(self):
