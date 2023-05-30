@@ -46,13 +46,14 @@ If you have an NVIDIA graphics processor, you can activate GPU acceleration by i
 
 ### Run the program
 
-`python application.py <optional: model_file.pt>`
+`python application.py <optional: model_file.pt>` **OR** `python3 application.py <optional: model_file.pt>`
 
+The default model is loaded if no model file is specified.
 # About
 
 This project was developed by Niklas Hoefflin, Tim Spulak,
 Pascal Gerber & Jan Bösch and supervised by André Jeworutzki
-and Jan Schwarzer as part of the "Train Like A Machine" module.
+and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg.de/project/TLAM/) module.
 
 # License
 
