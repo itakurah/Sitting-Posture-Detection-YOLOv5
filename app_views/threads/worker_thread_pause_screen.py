@@ -8,11 +8,12 @@ from PyQt5.QtGui import QPixmap, QImage
 
 
 class WorkerThreadPauseScreen(QtCore.QThread):
-    update_pause_screen = QtCore.pyqtSignal(QPixmap)
+    update_pause_screen = QtCore.pyqtSignal(object, QPixmap)
 
-    def __init__(self, width, height):
+    def __init__(self, view, width, height):
         # Use super() to call __init__() methods in the parent classes
         super(WorkerThreadPauseScreen, self).__init__()
+        self.view = view
         self.pixmap = QPixmap(width, height)
         self.width = int(width)
         self.height = int(height)
@@ -34,7 +35,7 @@ class WorkerThreadPauseScreen(QtCore.QThread):
             image = QImage(resized_colors.data, resized_colors.shape[1], resized_colors.shape[0], QImage.Format_RGB888)
 
             self.pixmap = QPixmap.fromImage(image)
-            self.update_pause_screen.emit(self.pixmap)
+            self.update_pause_screen.emit(self.view, self.pixmap)
             self.msleep(90)
 
     def stop(self):

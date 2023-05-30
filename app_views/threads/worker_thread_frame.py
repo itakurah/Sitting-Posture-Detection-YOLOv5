@@ -1,25 +1,34 @@
 import time
 
+import numpy as np
+from PIL.Image import Image
+import matplotlib.pyplot as plt
+from PIL import Image
 from PyQt5 import QtCore
 
-from util.helper.frame_helper import *
+from app_controllers.utils.frame_helper import *
 
 '''Thread class for handling the received frames
 '''
 
 
 class WorkerThreadFrame(QtCore.QThread):
-    update_camera = QtCore.pyqtSignal(object, object, object)
+    update_camera = QtCore.pyqtSignal(object, object, object, object, object)
 
-    def __init__(self, model, id, slider_brightness, slider_contrast):
+    def __init__(self, model, view):
         # Use super() to call __init__() methods in the parent classes
         super(WorkerThreadFrame, self).__init__()
         self.model = model
-        self.slider_brightness = slider_brightness
-        self.slider_contrast = slider_contrast
+        self.view = view
+        self.inference_model = model.inference_model
+        self.slider_brightness = view.slider_brightness
+        self.button_rotate = view.button_rotate
+        self.slider_contrast = view.slider_contrast
         # Place the camera object in the WorkThread
         self.frame = None
-        self.camera = cv2.VideoCapture(id)
+        print(model.camera_mapping.get(view.combobox_camera_list.currentText()))
+        self.id = model.camera_mapping.get(view.combobox_camera_list.currentText())
+        self.camera = cv2.VideoCapture(self.id)
         # set video format to mjpg to compress the frames to increase fps
         self.camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
         # set frame resolution
@@ -46,9 +55,22 @@ class WorkerThreadFrame(QtCore.QThread):
             self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
             # change contrast based on slider value
             self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
-            # predict using model
-            results = self.model.predict(self.frame)
-            self.update_camera.emit(self.frame, fps, results)
+            if self.model.frame_rotation == 90:
+                self.frame = np.rot90(self.frame, -1, (0, 1))
+                # i = Image.fromarray(self.frame)
+                # i.save("image.png")
+            elif self.model.frame_rotation == 180:
+                self.frame = np.rot90(self.frame, -2, (0, 1))
+            elif self.model.frame_rotation == 270:
+                self.frame = np.rot90(self.frame, -3, (0, 1))
+
+            if self.model.frame_orientation_vertical == 1:
+                self.frame = np.flipud(self.frame)
+            if self.model.frame_orientation_horizontal == 1:
+                self.frame = np.fliplr(self.frame)
+            # predict using inference_models
+            results = self.inference_model.predict(self.frame)
+            self.update_camera.emit(self.model, self.view, self.frame, fps, results)
 
     def stop(self):
         # terminate the while loop in self.run() method
