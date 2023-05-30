@@ -7,27 +7,29 @@ from PyQt5.QtCore import QDateTime, Qt
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QColor, QPainter
 from PyQt5.QtWidgets import QColorDialog, QDesktopWidget
 
-from util.helper import camera_helper, frame_helper
-from util.helper.load_model import InferenceModel
-from util.threads.worker_thread_frame import WorkerThreadFrame
-from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
-from views.fullscreen_view import FullscreenView
+from app_controllers.utils import camera_helper
+from app_views.fullscreen_view import FullscreenView
+from app_views.threads.worker_thread_frame import WorkerThreadFrame
+from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
 class Controller():
+
     def __init__(self, model, view):
         super().__init__()
-        self.worker_thread_pause_screen = None
-        self.work_thread_camera = None
         self.model = model
-        self.is_fullscreen = True
+        self.view = view
 
     @staticmethod
-    def show_fullscreen(view):
-        view.fullscreen_window.showFullScreen()
+    def show_fullscreen(model):
+        model.fullscreen_window = FullscreenView()
+        model.fullscreen_window.fullscreen_closed.connect(lambda: Controller.on_fullscreen_closed(model))
+        model.is_fullscreen = True
+        model.fullscreen_window.showFullScreen()
 
-    def on_fullscreen_closed(self):
-        self.is_fullscreen = False
+    @staticmethod
+    def on_fullscreen_closed(model):
+        model.is_fullscreen = False
 
     @staticmethod
     def on_button_pressed(button, path):
@@ -100,7 +102,8 @@ class Controller():
             view.button_stop.setEnabled(True)
 
     # update combobox items with current available cameras
-    def on_combobox_camera_list_changed(self, view):
+    @staticmethod
+    def on_combobox_camera_list_changed(view, model):
         QtCore.QCoreApplication.processEvents()
         view.combobox_camera_list.setEnabled(False)
         view.button_start.setEnabled(False)
@@ -108,7 +111,7 @@ class Controller():
         # workaround to process the stack otherwise it will ignore the statements above
         QtCore.QCoreApplication.processEvents()
         if camera_helper.is_camera_connected():
-            self.update_combobox_camera_list_items(view)
+            Controller.update_combobox_camera_list_items(view, model)
             view.button_start.setEnabled(True)
         else:
             view.button_start.setEnabled(False)
@@ -117,20 +120,27 @@ class Controller():
         QtCore.QCoreApplication.processEvents()
 
     # update combobox items
-    @staticmethod
-    def update_combobox_camera_list_items(view):
+
+    def update_combobox_camera_list_items(view, model):
         view.status_bar.showMessage('Updating camera list..')
         QtCore.QCoreApplication.processEvents()
-        view.combobox_camera_list.currentTextChanged.disconnect(Controller.on_combobox_camera_list_changed)
+        view.combobox_camera_list.currentTextChanged.disconnect()
         text = view.combobox_camera_list.currentText()
-        view.camera_mapping = camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
-                                                               camera_helper.get_connected_camera_ids())
+        print("#####")
+        print(camera_helper.get_connected_camera_alias())
+        print(camera_helper.get_connected_camera_ids())
+        print(camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
+                                               camera_helper.get_connected_camera_ids()))
+        model.camera_mapping = camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
+                                                                camera_helper.get_connected_camera_ids())
+
         view.combobox_camera_list.clear()
-        view.combobox_camera_list.addItems(view.camera_mapping.keys())
+        view.combobox_camera_list.addItems(model.camera_mapping.keys())
         index = view.combobox_camera_list.findText(text, QtCore.Qt.MatchFixedString)
         if index >= 0:
             view.combobox_camera_list.setCurrentIndex(index)
-        view.combobox_camera_list.currentTextChanged.connect(Controller.on_combobox_camera_list_changed)
+        view.combobox_camera_list.currentTextChanged.connect(
+            lambda: Controller.on_combobox_camera_list_changed(view, model))
 
     # update memory and cpu usage in statusbar
     @staticmethod
@@ -187,27 +197,28 @@ class Controller():
     @staticmethod
     def start_worker_thread_camera(view, model):
         current_item = view.combobox_camera_list.currentText()
-        Controller.work_thread_camera = WorkerThreadFrame(model.inference_model, model.camera_mapping.get(current_item),
-                                                          view.slider_brightness,
-                                                          view.slider_contrast)
-        Controller.work_thread_camera.update_camera.connect(Controller.draw_frame)
-        Controller.work_thread_camera.start()
+        print(current_item)
+        print(model.camera_mapping.get(current_item))
+        model.work_thread_camera = WorkerThreadFrame(model, view)
+        model.work_thread_camera.update_camera.connect(Controller.draw_frame)
+        model.work_thread_camera.start()
 
     @staticmethod
-    def stop_worker_thread_pause_screen(view):
-        view.worker_thread_pause_screen.stop()
+    def stop_worker_thread_pause_screen(model):
+        model.worker_thread_pause_screen.stop()
 
     # stop camera worker thread
-    def stop_worker_thread_camera(self):
-        if self.work_thread_camera is not None:
-            self.work_thread_camera.stop()
-            self.work_thread_camera.wait()
-            self.work_thread_camera = None
-        if self.model.camera is not None:
-            self.model.camera.release()
-            self.model.camera = None
+    @staticmethod
+    def stop_worker_thread_camera(model):
+        if model.work_thread_camera is not None:
+            model.work_thread_camera.stop()
+            model.work_thread_camera.wait()
+            model.work_thread_camera = None
+        if model.camera is not None:
+            model.camera.release()
+            model.camera = None
         cv2.destroyAllWindows()
-        self.model.flag_is_camera_thread_running = False
+        model.flag_is_camera_thread_running = False
 
     @staticmethod
     def on_button_start_clicked(view, model):
@@ -223,72 +234,76 @@ class Controller():
         # start worker thread
         Controller.start_worker_thread_camera(view, model)
         # stop worker thread
-        Controller.stop_worker_thread_pause_screen(view)
+        Controller.stop_worker_thread_pause_screen(model)
         view.label_no_camera.setHidden(True)
 
     @staticmethod
-    def on_button_stop_clicked(view):
+    def on_button_stop_clicked(view, model):
         view.status_bar.showMessage('Stream stopped..')
         # enable gui elements
         view.label_no_camera.setHidden(False)
         view.label_stream.setHidden(True)
         view.button_stop.setEnabled(False)
+        model.frame_rotation = 0
         QtCore.QCoreApplication.processEvents()
         view.timer_stop.start(2000)
         # stop camera thread
-        view.stop_worker_thread_camera()
-        view.start_worker_thread_pause_screen()
+        Controller.stop_worker_thread_camera(model)
+        Controller.start_worker_thread_pause_screen(model, view)
 
     # display frame to label_stream
-    def draw_frame(self, img, fps, results):
-        if self.model.flag_is_camera_thread_running:
-            self.model.status_bar.showMessage('Getting camera stream..')
-        QtCore.QCoreApplication.processEvents()
+    @staticmethod
+    def draw_frame(model, view, img, fps, results):
+        if model.flag_is_camera_thread_running:
+            view.status_bar.showMessage('Getting camera stream..')
+        # QtCore.QCoreApplication.processEvents()
         class_name, confidence = None, None
         # convert to rgb format
         frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # resize to fit into QImage element
-        if frame.shape[0] > frame.shape[1]:
-            frame = frame_helper.resize_frame(frame, None, self.model.IMAGE_BOX_SIZE)
-        else:
-            frame = frame_helper.resize_frame(frame, self.model.IMAGE_BOX_SIZE)
         # get height and width of frame
         height, width = frame.shape[:2]
         # format results as pandas table
         # results = results.pandas().xyxy[0].to_dict(orient="records")
         if len(results.pandas().xyxy[0].value_counts('name')) > 0:
             # get single results from prediction
-            (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = InferenceModel.get_results(results)
-            self.draw_items(frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence)
+            (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = model.inference_model.get_results(
+                results)
+            Controller.draw_items(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence)
         else:
-            self.set_border_color(self.model.label_stream, 'black')
-            (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = InferenceModel.get_results(results)
+            Controller.set_border_color(view.label_stream, 'black')
+            (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = model.inference_model.get_results(
+                results)
         # convert frame to QPixmap format
         bytes_per_line = 3 * width
         q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
-        self.model.pixmap = QPixmap.fromImage(q_image)
-        # add border to frame
-        self.model.pixmap = self.draw_black_border(self.model.pixmap)
-        if self.model.flag_is_camera_thread_running:
-            self.update_statusbar(height, width, fps, class_name, confidence)
+        pixmap = QPixmap.fromImage(q_image)
+        if model.flag_is_camera_thread_running:
+            Controller.update_statusbar(view, height, width, fps, class_name, confidence)
         else:
-            self.update_statusbar()
-        if self.is_fullscreen:
-            self.fullscreen_window.set_central_widget_content(self.model.pixmap)
+            Controller.update_statusbar(view)
+        if model.is_fullscreen:
+            model.fullscreen_window.set_central_widget_content(pixmap)
         else:
-            self.model.label_stream.setPixmap(QPixmap.fromImage(self.model.pixmap))
-        self.model.label_stream.adjustSize()
-        self.model.label_stream.update()
+            pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio,
+                                          Qt.SmoothTransformation)
+            # fill emtpy area with black
+            pixmap = Controller.draw_black_border(view, pixmap_scaled)
+            view.label_stream.setPixmap(pixmap)
+        # view.label_stream.adjustSize()
+        # view.label_stream.setAlignment(Qt.AlignCenter)
+        view.label_stream.update()
 
     # draw items on frame
-    def draw_items(self, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
-        self.draw_bounding_box(frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2)
-        self.draw_information(frame, class_name, confidence)
+    @staticmethod
+    def draw_items(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
+        Controller.draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2)
+        Controller.draw_information(model, view, frame, class_name, confidence)
 
     # draw black border around frame
-    def draw_black_border(self, pixmap):
-        border_width = self.model.label_stream.width()
-        border_height = self.model.label_stream.height()
+    @staticmethod
+    def draw_black_border(view, pixmap):
+        border_width = view.label_stream.width()
+        border_height = view.label_stream.height()
         pixmap_scaled = pixmap.scaled(border_width, border_height, aspectRatioMode=Qt.KeepAspectRatio)
         # create a black QImage with the same size as the label
         border_pixmap = QImage(border_width, border_height, QImage.Format_RGB888)
@@ -300,18 +315,20 @@ class Controller():
         painter = QPainter(border_pixmap)
         painter.drawPixmap(x, y, pixmap_scaled)
         painter.end()
-        return border_pixmap
+        return QPixmap.fromImage(border_pixmap)
 
     # draw bounding box on frame
-    def draw_bounding_box(self, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2):
-        if self.model.cbox_enable_bbox.isChecked():
-            cv2.rectangle(frame, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), self.box_color, self.model.box_thickness)
+    @staticmethod
+    def draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2):
+        if view.cbox_enable_bbox.isChecked():
+            cv2.rectangle(frame, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), model.box_color, model.box_thickness)
 
     # draw class name on frame
-    def draw_information(self, frame, class_name, confidence):
+    @staticmethod
+    def draw_information(model, view, frame, class_name, confidence):
         # example text to get dimensions of actual text
-        text_size, _ = cv2.getTextSize('confidence: 100.00%', self.model.text_font,
-                                       self.model.text_font_scale, self.model.text_thickness)
+        text_size, _ = cv2.getTextSize('confidence: 100.00%', model.text_font,
+                                       model.text_font_scale, model.text_thickness)
         # extract width and height from text size
         width = text_size[0]
         height = text_size[1]
@@ -322,94 +339,125 @@ class Controller():
 
         # check which radio button is selected
         # bottom left corner
-        if self.model.button_group.checkedId() == 1:
+        if view.button_group.checkedId() == 1:
             # set text to bottom left
             x_bottom_left = 10
             y_bottom_left = frame_height - 10
             x1, y1, x2, y2 = x_bottom_left, y_bottom_left, x_bottom_left + width, y_bottom_left - height
         # bottom right corner
-        elif self.model.button_group.checkedId() == 2:
+        elif view.button_group.checkedId() == 2:
             # set text to bottom right
             x_bottom_right = frame_width - width - 10
             y_bottom_right = frame_height - 10
             x1, y1, x2, y2 = x_bottom_right, y_bottom_right, x_bottom_right + width, y_bottom_right - height
         # top left corner
-        elif self.model.button_group.checkedId() == 3:
+        elif view.button_group.checkedId() == 3:
             # set text to top left
             x_top_left = 10
             y_top_left = height + 25
             x1, y1, x2, y2 = x_top_left, y_top_left, x_top_left + width, y_top_left - height
         # yop right corner
-        elif self.model.button_group.checkedId() == 4:
+        elif view.button_group.checkedId() == 4:
             # set text to top right
             x_top_right = frame_width - width - 10
             y_top_right = height + 25
             x1, y1, x2, y2 = x_top_right, y_top_right, x_top_right + width, y_top_right - height
         # space between text and border of rectangle
         border_space = 10
-        if self.model.cbox_enable_info_background.isChecked():
+        if view.cbox_enable_info_background.isChecked():
             # class is checked
-            if self.model.cbox_enable_class.isChecked() & (not self.model.cbox_enable_conf.isChecked()):
+            if view.cbox_enable_class.isChecked() & (not view.cbox_enable_conf.isChecked()):
                 # draw black box background
-                cv2.rectangle(frame, (x1, y1 + (int((self.model.text_font_scale * 100) / 10))),
+                cv2.rectangle(frame, (x1, y1 + (int((model.text_font_scale * 100) / 10))),
                               (x2, y2),
-                              self.text_color_bg, -1)
+                              model.text_color_bg, -1)
             # conf is checked
-            elif self.model.cbox_enable_conf.isChecked() & (not self.model.cbox_enable_class.isChecked()):
+            elif view.cbox_enable_conf.isChecked() & (not view.cbox_enable_class.isChecked()):
                 # draw black box background
-                cv2.rectangle(frame, (x1, y2 + (int((self.model.text_font_scale * 100) / 10)) - border_space),
+                cv2.rectangle(frame, (x1, y2 + (int((model.text_font_scale * 100) / 10)) - border_space),
                               (x2, y2 - (y1 - y2) - border_space),
-                              self.text_color_bg, -1)
+                              model.text_color_bg, -1)
             # class and conf is checked
-            elif self.model.cbox_enable_class.isChecked() & self.model.cbox_enable_conf.isChecked():
+            elif view.cbox_enable_class.isChecked() & view.cbox_enable_conf.isChecked():
                 # draw black box background
-                cv2.rectangle(frame, (x1, y1 + (int((self.model.text_font_scale * 100) / 10))),
+                cv2.rectangle(frame, (x1, y1 + (int((model.text_font_scale * 100) / 10))),
                               (x2, y2 - (y1 - y2) - border_space),
-                              self.text_color_bg, -1)
-        if self.model.cbox_enable_conf.isChecked():
+                              model.text_color_bg, -1)
+        if view.cbox_enable_conf.isChecked():
             # draw confidence score
             cv2.putText(frame, 'confidence: ' + '{:.2f}'.format(confidence * 100) + '%',
                         (x1, y1 + (y2 - y1) - border_space),
-                        self.model.text_font,
-                        self.model.text_font_scale, self.text_color_conf, self.model.text_thickness, cv2.LINE_AA)
-        if self.model.cbox_enable_class.isChecked():
+                        model.text_font,
+                        model.text_font_scale, model.text_color_conf, model.text_thickness, cv2.LINE_AA)
+        if view.cbox_enable_class.isChecked():
             # draw class name
             cv2.putText(frame, 'sitting: good' if class_name == 0 else 'sitting: bad', (x1, y1),
-                        self.model.text_font,
-                        self.model.text_font_scale, self.text_color_class, self.model.text_thickness, cv2.LINE_AA)
+                        model.text_font,
+                        model.text_font_scale, model.text_color_class, model.text_thickness, cv2.LINE_AA)
         if class_name == 0:
-            self.set_border_color(self.model.label_stream, 'green')
+            Controller.set_border_color(view.label_stream, 'green')
         else:
-            self.set_border_color(self.model.label_stream, 'red')
+            Controller.set_border_color(view.label_stream, 'red')
 
     # update the statusbar while streaming
-    def update_statusbar(self, height=None, width=None, fps=None, class_name=None, confidence=None):
+    @staticmethod
+    def update_statusbar(view, height=None, width=None, fps=None, class_name=None, confidence=None):
         # update image size label
         if (height is None) & (width is None):
-            self.model.label_dim.setText("Image size: -")
+            view.label_dim.setText("Image size: -")
         else:
-            self.model.label_dim.setText("Image size: " + str(width) + "x" + str(height))
+            view.label_dim.setText("Image size: " + str(width) + "x" + str(height))
         # update fps label
         if fps is None:
-            self.model.label_fps.setText("FPS: 0.00")
+            view.label_fps.setText("FPS: 0.00")
         else:
-            self.model.label_fps.setText("FPS: {:.2f}".format(fps))
+            view.label_fps.setText("FPS: {:.2f}".format(fps))
         # update detected class
         if class_name is None:
-            self.model.label_class_info.setText("Class: -")
+            view.label_class_info.setText("Class: -")
         elif class_name == 0:
-            self.model.label_class_info.setText("Class: 0")
+            view.label_class_info.setText("Class: 0")
         else:
-            self.model.label_class_info.setText("Class: 1")
+            view.label_class_info.setText("Class: 1")
         # update confidence
         if confidence is None:
-            self.model.label_conf.setText('Confidence: 0.00')
+            view.label_conf.setText('Confidence: 0.00')
         else:
-            self.model.label_conf.setText('Confidence: {:.2f}'.format(confidence))
+            view.label_conf.setText('Confidence: {:.2f}'.format(confidence))
 
     # start camera worker thread
-    def start_worker_thread_pause_screen(self):
-        self.worker_thread_pause_screen = WorkerThreadPauseScreen(self.model.label_stream_width,
-                                                                  self.model.label_stream_height)
-        self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
-        self.worker_thread_pause_screen.start()
+    @staticmethod
+    def start_worker_thread_pause_screen(model, view):
+        model.worker_thread_pause_screen = None
+        model.worker_thread_pause_screen = WorkerThreadPauseScreen(view, view.label_stream_width,
+                                                                   view.label_stream_height)
+        model.worker_thread_pause_screen.update_pause_screen.connect(Controller.update_pause_frame)
+        model.worker_thread_pause_screen.start()
+
+    @staticmethod
+    def update_pause_frame(view, pixmap):
+        view.label_no_camera.adjustSize()
+        view.label_no_camera.setPixmap(pixmap)
+        view.label_no_camera.update()
+
+    @staticmethod
+    def update_frame_rotation_degrees(model):
+        if model.frame_rotation == 270:
+            model.frame_rotation = 0
+        else:
+            model.frame_rotation += 90
+        print(model.frame_rotation)
+
+    @staticmethod
+    def update_frame_flip_vertical(model):
+        if model.frame_orientation_vertical == 0:
+            model.frame_orientation_vertical = 1
+        else:
+            model.frame_orientation_vertical = 0
+
+    @staticmethod
+    def update_frame_flip_horizontal(model):
+        if model.frame_orientation_horizontal == 0:
+            model.frame_orientation_horizontal = 1
+        else:
+            model.frame_orientation_horizontal = 0

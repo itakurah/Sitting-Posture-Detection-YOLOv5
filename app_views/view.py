@@ -5,17 +5,15 @@ from PyQt5.QtCore import QTimer, QSize
 from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioButton, QButtonGroup, QCheckBox, \
-    QStatusBar, QDesktopWidget, QColorDialog, QSlider, QWidget, QMainWindow
+    QStatusBar, QSlider, QWidget, QMainWindow
 
-from controllers import controller
-from controllers.controller import Controller
-from models.model import Model
-from util.helper.camera_helper import get_connected_camera_alias
-from util.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
-from util.threads.worker_thread_system_resource import WorkerThreadSystemResource
-from views.fullscreen_view import FullscreenView
+from app_controllers.controller import Controller
+from app_controllers.utils.camera_helper import get_connected_camera_alias
+from app_views.fullscreen_view import FullscreenView
+from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
+from app_views.threads.worker_thread_system_resource import WorkerThreadSystemResource
 
-'''Class for creating the application views
+'''Class for creating the application app_views
 '''
 
 
@@ -26,11 +24,12 @@ class View(QMainWindow):
         # window properties
         self.gui_width = 870
         self.gui_height = 540
+        self.model = model
         self.setWindowTitle('Sitting Posture Detector (commit {})'.format(model.get_commit_hash()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
         self.setFixedSize(self.gui_width, self.gui_height)
         # Set icon
-        self.setWindowIcon(QtGui.QIcon('images/logo.png'))
+        self.setWindowIcon(QtGui.QIcon('data/images/logo.png'))
         # centers the window
         Controller.center_window(self)
         # Set taskbar icon in Windows
@@ -61,7 +60,7 @@ class View(QMainWindow):
         self.button_fullscreen.setFixedWidth(45)
         self.button_fullscreen.setFixedHeight(45)
         self.button_fullscreen.setToolTip('Enable/Disable fullscreen')
-        self.button_fullscreen.setIcon(QIcon('images/fullscreen_icon.png'))
+        self.button_fullscreen.setIcon(QIcon('data/images/fullscreen_icon.png'))
         self.button_fullscreen.setIconSize(QSize(25, 25))
 
         # image label properties
@@ -104,7 +103,7 @@ class View(QMainWindow):
         self.button_flip_horizontal.setToolTip('Flip image horizontal')
         self.button_flip_horizontal.setFixedWidth(28)
         self.button_flip_horizontal.setFixedHeight(28)
-        self.button_flip_horizontal.setIcon(QIcon('images/flip_horizontal.png'))
+        self.button_flip_horizontal.setIcon(QIcon('data/images/flip_horizontal.png'))
         self.button_flip_horizontal.setIconSize(QSize(25, 25))
 
         # flip vertical button
@@ -113,7 +112,7 @@ class View(QMainWindow):
         self.button_flip_vertical.setToolTip('Flip image vertical')
         self.button_flip_vertical.setFixedWidth(28)
         self.button_flip_vertical.setFixedHeight(28)
-        self.button_flip_vertical.setIcon(QIcon('images/flip_vertical.png'))
+        self.button_flip_vertical.setIcon(QIcon('data/images/flip_vertical.png'))
         self.button_flip_vertical.setIconSize(QSize(25, 25))
 
         # rotate button
@@ -122,7 +121,7 @@ class View(QMainWindow):
         self.button_rotate.setToolTip('Rotate image by 90 degrees')
         self.button_rotate.setFixedWidth(28)
         self.button_rotate.setFixedHeight(28)
-        self.button_rotate.setIcon(QIcon('images/rotate.png'))
+        self.button_rotate.setIcon(QIcon('data/images/rotate.png'))
         self.button_rotate.setIconSize(QSize(25, 25))
 
         # radio buttons properties
@@ -264,9 +263,10 @@ class View(QMainWindow):
         self.worker_thread_memory.update_memory.connect(lambda: Controller.update_system_resource(model, self))
         self.worker_thread_memory.start()
 
-        self.worker_thread_pause_screen = WorkerThreadPauseScreen(self.label_stream_width, self.label_stream_height)
-        self.worker_thread_pause_screen.update_pause_screen.connect(self.update_pause_frame)
-        self.worker_thread_pause_screen.start()
+        model.worker_thread_pause_screen = WorkerThreadPauseScreen(self, self.label_stream_width,
+                                                                   self.label_stream_height)
+        model.worker_thread_pause_screen.update_pause_screen.connect(Controller.update_pause_frame)
+        model.worker_thread_pause_screen.start()
 
         # start pause screen thread
 
@@ -331,32 +331,46 @@ class View(QMainWindow):
                                              'QToolTip {background-color: #323844;'
                                              'font-weight: bold;'
                                              'border: none}')
-        self.button_fullscreen.clicked.connect(Controller.show_fullscreen)
+        self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
         self.fullscreen_window = FullscreenView()
         self.fullscreen_window.fullscreen_closed.connect(Controller.on_fullscreen_closed)
         self.button_flip_horizontal.pressed.connect(
-            lambda: Controller.on_button_pressed(self.button_flip_horizontal, 'images'
+            lambda: Controller.on_button_pressed(self.button_flip_horizontal, 'data'
+                                                                              '/images'
                                                                               '/flip_horizontal_pressed'
                                                                               '.png'))
         self.button_flip_horizontal.released.connect(
-            lambda: Controller.on_button_released(self.button_flip_horizontal, 'images'
+            lambda: Controller.on_button_released(self.button_flip_horizontal, 'data'
+                                                                               '/images'
                                                                                '/flip_horizontal'
                                                                                '.png'))
 
         self.button_flip_vertical.pressed.connect(
-            lambda: Controller.on_button_pressed(self.button_flip_vertical, 'images'
+            lambda: Controller.on_button_pressed(self.button_flip_vertical, 'data'
+                                                                            '/images'
                                                                             '/flip_vertical_pressed'
                                                                             '.png'))
         self.button_flip_vertical.released.connect(
-            lambda: Controller.on_button_released(self.button_flip_vertical, 'images'
+            lambda: Controller.on_button_released(self.button_flip_vertical, 'data'
+                                                                             '/images'
                                                                              '/flip_vertical'
                                                                              '.png'))
-        self.button_rotate.pressed.connect(lambda: Controller.on_button_pressed(self.button_rotate, 'images'
+        self.button_rotate.pressed.connect(lambda: Controller.on_button_pressed(self.button_rotate, 'data'
+                                                                                                    '/images'
                                                                                                     '/rotate_pressed'
                                                                                                     '.png'))
-        self.button_rotate.released.connect(lambda: Controller.on_button_released(self.button_rotate, 'images'
+        self.button_rotate.released.connect(lambda: Controller.on_button_released(self.button_rotate, 'data'
+                                                                                                      '/images'
                                                                                                       '/rotate'
                                                                                                       '.png'))
+        self.button_fullscreen.pressed.connect(lambda: Controller.on_button_pressed(self.button_fullscreen, 'data'
+                                                                                                            '/images'
+                                                                                                            '/fullscreen_icon_pressed'
+                                                                                                            '.png'))
+        self.button_fullscreen.released.connect(lambda: Controller.on_button_pressed(self.button_fullscreen, 'data'
+                                                                                                             '/images'
+                                                                                                             '/fullscreen_icon'
+                                                                                                             '.png'))
         self.status_bar.messageChanged.connect(lambda: Controller.update_last_update_time(self))
         self.timer_statusbar_idle.timeout.connect(lambda: Controller.check_idle_time(self))
         self.cbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
@@ -365,9 +379,10 @@ class View(QMainWindow):
         self.slider_contrast.valueChanged.connect(
             lambda: Controller.update_slider_text(self.slider_contrast, self.label_contrast_control))
 
-        self.combobox_camera_list.currentTextChanged.connect(Controller.on_combobox_camera_list_changed)
-        self.button_start.clicked.connect(lambda: Controller.on_button_start_clicked(self,model))
-        self.button_stop.clicked.connect(lambda: Controller.on_button_stop_clicked(self))
+        self.combobox_camera_list.currentTextChanged.connect(
+            lambda: Controller.on_combobox_camera_list_changed(self, model))
+        self.button_start.clicked.connect(lambda: Controller.on_button_start_clicked(self, model))
+        self.button_stop.clicked.connect(lambda: Controller.on_button_stop_clicked(self, model))
         self.timer_start.timeout.connect(lambda: Controller.timer_timeout_start(self))
         self.timer_stop.timeout.connect(lambda: Controller.timer_timeout_stop(self))
         self.button_color_box.clicked.connect(lambda: Controller.show_color_picker(self, self.button_color_box))
@@ -377,10 +392,12 @@ class View(QMainWindow):
         self.button_color_bg.clicked.connect(lambda: Controller.show_color_picker(self, self.button_color_bg))
         self.button_reset_brightness.clicked.connect(lambda: self.slider_brightness.setValue(100))
         self.button_reset_contrast.clicked.connect(lambda: self.slider_contrast.setValue(100))
+        self.button_rotate.clicked.connect(lambda: Controller.update_frame_rotation_degrees(model))
+        self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
+        self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
         # load cbox items
-        Controller.update_combobox_camera_list_items(self)
+        # Controller.update_combobox_camera_list_items(self)
 
-    def update_pause_frame(self, pixmap):
-        self.label_no_camera.adjustSize()
-        self.label_no_camera.setPixmap(pixmap)
-        self.label_no_camera.update()
+    def closeEvent(self, event):
+        Controller.stop_worker_thread_camera(self.model)
+        self.worker_thread_memory.stop()
