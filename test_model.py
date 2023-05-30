@@ -1,6 +1,6 @@
 import sys
 
-from util.helper.load_model import InferenceModel
+from app_models.load_model import InferenceModel
 import cv2
 import glob
 
