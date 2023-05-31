@@ -66,8 +66,6 @@ class WorkerThreadFrame(QtCore.QThread):
     def check_rotation(self):
         if self.model.frame_rotation == 90:
             self.frame = np.rot90(self.frame, -1, (0, 1))
-            # i = Image.fromarray(self.frame)
-            # i.save("image.png")
         elif self.model.frame_rotation == 180:
             self.frame = np.rot90(self.frame, -2, (0, 1))
         elif self.model.frame_rotation == 270:
