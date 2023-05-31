@@ -1,9 +1,5 @@
 import time
 
-import numpy as np
-from PIL.Image import Image
-import matplotlib.pyplot as plt
-from PIL import Image
 from PyQt5 import QtCore
 
 from app_controllers.utils.frame_helper import *
@@ -55,19 +51,8 @@ class WorkerThreadFrame(QtCore.QThread):
             self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
             # change contrast based on slider value
             self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
-            if self.model.frame_rotation == 90:
-                self.frame = np.rot90(self.frame, -1, (0, 1))
-                # i = Image.fromarray(self.frame)
-                # i.save("image.png")
-            elif self.model.frame_rotation == 180:
-                self.frame = np.rot90(self.frame, -2, (0, 1))
-            elif self.model.frame_rotation == 270:
-                self.frame = np.rot90(self.frame, -3, (0, 1))
-
-            if self.model.frame_orientation_vertical == 1:
-                self.frame = np.flipud(self.frame)
-            if self.model.frame_orientation_horizontal == 1:
-                self.frame = np.fliplr(self.frame)
+            self.check_rotation()
+            self.check_orientation()
             # predict using inference_models
             results = self.inference_model.predict(self.frame)
             self.update_camera.emit(self.model, self.view, self.frame, fps, results)
@@ -77,3 +62,19 @@ class WorkerThreadFrame(QtCore.QThread):
         self.running = False
         self.camera.release()
         cv2.destroyAllWindows()
+
+    def check_rotation(self):
+        if self.model.frame_rotation == 90:
+            self.frame = np.rot90(self.frame, -1, (0, 1))
+            # i = Image.fromarray(self.frame)
+            # i.save("image.png")
+        elif self.model.frame_rotation == 180:
+            self.frame = np.rot90(self.frame, -2, (0, 1))
+        elif self.model.frame_rotation == 270:
+            self.frame = np.rot90(self.frame, -3, (0, 1))
+
+    def check_orientation(self):
+        if self.model.frame_orientation_vertical == 1:
+            self.frame = np.flipud(self.frame)
+        if self.model.frame_orientation_horizontal == 1:
+            self.frame = np.fliplr(self.frame)
