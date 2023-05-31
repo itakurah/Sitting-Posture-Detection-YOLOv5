@@ -392,8 +392,6 @@ class View(QMainWindow):
         self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
         self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
         self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
-        # load cbox items
-        # Controller.update_combobox_camera_list_items(self)
 
     def closeEvent(self, event):
         Controller.stop_worker_thread_camera(self.model)
