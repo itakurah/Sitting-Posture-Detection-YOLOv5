@@ -180,14 +180,11 @@ class View(QMainWindow):
         self.status_bar.addPermanentWidget(self.label_memory_usage)
         self.label_cpu_usage = QLabel('CPU: -')
         self.status_bar.addPermanentWidget(self.label_cpu_usage)
+        self.status_bar.showMessage('Idle')
 
         # create timer for buttons
         self.timer_start = QTimer()
         self.timer_stop = QTimer()
-        self.timer_statusbar_idle = QTimer()
-        self.last_update_time = QDateTime.currentDateTime()
-
-        self.timer_statusbar_idle.start(2000)
 
         self.button_color_box = QPushButton('', self.groupbox_frame_options)
         self.button_color_box.move(140, 118)
@@ -367,8 +364,7 @@ class View(QMainWindow):
                                                                                                              '/images'
                                                                                                              '/fullscreen_icon'
                                                                                                              '.png'))
-        self.status_bar.messageChanged.connect(lambda: Controller.update_last_update_time(self))
-        self.timer_statusbar_idle.timeout.connect(lambda: Controller.check_idle_time(self))
+
         self.cbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
         self.slider_brightness.valueChanged.connect(
             lambda: Controller.update_slider_text(self.slider_brightness, self.label_brightness_control))

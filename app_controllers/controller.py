@@ -3,7 +3,7 @@ import os
 import cv2
 import psutil
 from IPython.external.qt_for_kernel import QtCore
-from PyQt5.QtCore import QDateTime, Qt
+from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QColor, QPainter
 from PyQt5.QtWidgets import QColorDialog, QDesktopWidget
 
@@ -21,6 +21,10 @@ class Controller():
         self.view = view
         model.fullscreen_window = FullscreenView()
         model.fullscreen_window.fullscreen_closed.connect(lambda: Controller.on_fullscreen_closed(model))
+        view.timer_statusbar_idle = QTimer()
+        view.timer_statusbar_idle.start(2000)
+        view.timer_statusbar_idle.timeout.connect(lambda: self.check_idle_time(view, model))
+        view.status_bar.messageChanged.connect(lambda: self.update_last_update_time(model))
 
     @staticmethod
     def show_fullscreen(model):
@@ -40,15 +44,15 @@ class Controller():
         button.setIcon(QIcon(path))
 
     @staticmethod
-    def update_last_update_time(view):
-        view.last_update_time = QDateTime.currentDateTime()
+    def update_last_update_time(model):
+        model.last_update_time = QDateTime.currentDateTime()
 
     @staticmethod
-    def check_idle_time(view):
+    def check_idle_time(view, model):
         if view.status_bar.currentMessage() == "Idle":
             return
         current_time = QDateTime.currentDateTime()
-        if view.last_update_time.msecsTo(current_time) >= 1000:
+        if model.last_update_time.msecsTo(current_time) >= 2000:
             view.status_bar.showMessage('Idle')
 
     # update color for frame and buttons
