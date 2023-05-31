@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioBut
 
 from app_controllers.controller import Controller
 from app_controllers.utils.camera_helper import get_connected_camera_alias
-from app_views.fullscreen_view import FullscreenView
 from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 from app_views.threads.worker_thread_system_resource import WorkerThreadSystemResource
 
@@ -331,9 +330,6 @@ class View(QMainWindow):
                                              'QToolTip {background-color: #323844;'
                                              'font-weight: bold;'
                                              'border: none}')
-        self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
-        self.fullscreen_window = FullscreenView()
-        self.fullscreen_window.fullscreen_closed.connect(Controller.on_fullscreen_closed)
         self.button_flip_horizontal.pressed.connect(
             lambda: Controller.on_button_pressed(self.button_flip_horizontal, 'data'
                                                                               '/images'
@@ -395,6 +391,7 @@ class View(QMainWindow):
         self.button_rotate.clicked.connect(lambda: Controller.update_frame_rotation_degrees(model))
         self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
         self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
+        self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
         # load cbox items
         # Controller.update_combobox_camera_list_items(self)
 

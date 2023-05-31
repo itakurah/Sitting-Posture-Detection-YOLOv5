@@ -19,11 +19,11 @@ class Controller():
         super().__init__()
         self.model = model
         self.view = view
+        model.fullscreen_window = FullscreenView()
+        model.fullscreen_window.fullscreen_closed.connect(lambda: Controller.on_fullscreen_closed(model))
 
     @staticmethod
     def show_fullscreen(model):
-        model.fullscreen_window = FullscreenView()
-        model.fullscreen_window.fullscreen_closed.connect(lambda: Controller.on_fullscreen_closed(model))
         model.is_fullscreen = True
         model.fullscreen_window.showFullScreen()
 
@@ -121,6 +121,7 @@ class Controller():
 
     # update combobox items
 
+    @staticmethod
     def update_combobox_camera_list_items(view, model):
         view.status_bar.showMessage('Updating camera list..')
         QtCore.QCoreApplication.processEvents()
@@ -282,9 +283,6 @@ class Controller():
         else:
             Controller.update_statusbar(view)
         if model.is_fullscreen:
-            pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            # fill emtpy area with black
-            pixmap = Controller.draw_black_border(view, pixmap_scaled)
             model.fullscreen_window.set_central_widget_content(pixmap)
         else:
             pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio,
