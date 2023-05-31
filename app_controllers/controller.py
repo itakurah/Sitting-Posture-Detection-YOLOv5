@@ -282,6 +282,9 @@ class Controller():
         else:
             Controller.update_statusbar(view)
         if model.is_fullscreen:
+            pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            # fill emtpy area with black
+            pixmap = Controller.draw_black_border(view, pixmap_scaled)
             model.fullscreen_window.set_central_widget_content(pixmap)
         else:
             pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio,

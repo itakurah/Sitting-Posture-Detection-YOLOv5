@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QMainWindow
 
 
+
 class FullscreenView(QMainWindow):
     fullscreen_closed = pyqtSignal()
 
@@ -15,8 +16,7 @@ class FullscreenView(QMainWindow):
 
     def set_central_widget_content(self, pixmap):
         if pixmap is not None:
-            pixmap_scaled = pixmap.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            self.label.setPixmap(QPixmap.fromImage(pixmap_scaled))
+            self.label.setPixmap(pixmap)
         self.setCentralWidget(self.label)
 
     def keyPressEvent(self, event):
