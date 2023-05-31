@@ -26,7 +26,7 @@ class WorkerThreadFrame(QtCore.QThread):
         self.slider_contrast = view.slider_contrast
         # Place the camera object in the WorkThread
         self.frame = None
-        print(model.camera_mapping.get(view.combobox_camera_list.currentText()))
+        # read current selected camera id
         self.id = model.camera_mapping.get(view.combobox_camera_list.currentText())
         self.camera = cv2.VideoCapture(self.id)
         # set video format to mjpg to compress the frames to increase fps

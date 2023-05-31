@@ -127,11 +127,6 @@ class Controller():
         QtCore.QCoreApplication.processEvents()
         view.combobox_camera_list.currentTextChanged.disconnect()
         text = view.combobox_camera_list.currentText()
-        print("#####")
-        print(camera_helper.get_connected_camera_alias())
-        print(camera_helper.get_connected_camera_ids())
-        print(camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
-                                               camera_helper.get_connected_camera_ids()))
         model.camera_mapping = camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
                                                                 camera_helper.get_connected_camera_ids())
 
@@ -198,8 +193,6 @@ class Controller():
     @staticmethod
     def start_worker_thread_camera(view, model):
         current_item = view.combobox_camera_list.currentText()
-        print(current_item)
-        print(model.camera_mapping.get(current_item))
         model.work_thread_camera = WorkerThreadFrame(model, view)
         model.work_thread_camera.update_camera.connect(Controller.draw_frame)
         model.work_thread_camera.start()
@@ -447,7 +440,6 @@ class Controller():
             model.frame_rotation = 0
         else:
             model.frame_rotation += 90
-        print(model.frame_rotation)
 
     @staticmethod
     def update_frame_flip_vertical(model):
