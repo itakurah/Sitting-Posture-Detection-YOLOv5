@@ -239,6 +239,8 @@ class Controller():
         view.label_stream.setHidden(True)
         view.button_stop.setEnabled(False)
         model.frame_rotation = 0
+        model.frame_orientation_vertical = 0
+        model.frame_orientation_horizontal = 0
         QtCore.QCoreApplication.processEvents()
         view.timer_stop.start(2000)
         # stop camera thread
