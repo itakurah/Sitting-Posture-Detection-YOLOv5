@@ -130,3 +130,6 @@ dmypy.json
 
 #IntelliJ
 .idea
+/test_images
+test.py
+test_model.py
