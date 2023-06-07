@@ -173,8 +173,8 @@ class Controller():
         view.move(qr.topLeft())
 
     @staticmethod
-    def set_border_color(label, color):
-        label.setStyleSheet('border: 4px solid {}'.format(color))
+    def draw_border(label, size, color):
+        label.setStyleSheet('border: {}px solid {};background-color: black;'.format(size, color))
 
     # show or hide debug features
     @staticmethod
@@ -264,15 +264,17 @@ class Controller():
         frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # get height and width of frame
         height, width = frame.shape[:2]
-        # format results as pandas table
-        # results = results.pandas().xyxy[0].to_dict(orient="records")
-        if len(results.pandas().xyxy[0].value_counts('name')) > 0:
+        # if the model detected a class
+        if results.xyxy[0] is not None and len(results.xyxy[0]) > 0:
             # get single results from prediction
             (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = model.inference_model.get_results(
                 results)
             Controller.draw_items(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence)
         else:
-            Controller.set_border_color(view.label_stream, 'black')
+            if model.is_fullscreen:
+                Controller.draw_border(model.fullscreen_window.label, 8, 'black')
+            else:
+                Controller.draw_border(view.label_stream, 4, 'black')
             (bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence) = model.inference_model.get_results(
                 results)
         # convert frame to QPixmap format
@@ -286,10 +288,8 @@ class Controller():
         if model.is_fullscreen:
             model.fullscreen_window.set_central_widget_content(pixmap)
         else:
-            pixmap_scaled = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio,
-                                          Qt.SmoothTransformation)
-            # fill emtpy area with black
-            pixmap = Controller.draw_black_border(view, pixmap_scaled)
+            pixmap = pixmap.scaled(view.label_stream.size(), Qt.AspectRatioMode.KeepAspectRatio,
+                                   Qt.SmoothTransformation)
             view.label_stream.setPixmap(pixmap)
         # view.label_stream.adjustSize()
         # view.label_stream.setAlignment(Qt.AlignCenter)
@@ -300,24 +300,6 @@ class Controller():
     def draw_items(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
         Controller.draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2)
         Controller.draw_information(model, view, frame, class_name, confidence)
-
-    # draw black border around frame
-    @staticmethod
-    def draw_black_border(view, pixmap):
-        border_width = view.label_stream.width()
-        border_height = view.label_stream.height()
-        pixmap_scaled = pixmap.scaled(border_width, border_height, aspectRatioMode=Qt.KeepAspectRatio)
-        # create a black QImage with the same size as the label
-        border_pixmap = QImage(border_width, border_height, QImage.Format_RGB888)
-        border_pixmap.fill(QColor(0, 0, 0))
-        # calculate the position to place the pixmap
-        x = (border_width - pixmap.width()) // 2
-        y = (border_height - pixmap.height()) // 2
-        # paint the pixmap onto the image with black borders
-        painter = QPainter(border_pixmap)
-        painter.drawPixmap(x, y, pixmap_scaled)
-        painter.end()
-        return QPixmap.fromImage(border_pixmap)
 
     # draw bounding box on frame
     @staticmethod
@@ -397,9 +379,15 @@ class Controller():
                         model.text_font,
                         model.text_font_scale, model.text_color_class, model.text_thickness, cv2.LINE_AA)
         if class_name == 0:
-            Controller.set_border_color(view.label_stream, 'green')
+            if model.is_fullscreen:
+                Controller.draw_border(model.fullscreen_window.label, 8, 'green')
+            else:
+                Controller.draw_border(view.label_stream, 4, 'green')
         else:
-            Controller.set_border_color(view.label_stream, 'red')
+            if model.is_fullscreen:
+                Controller.draw_border(model.fullscreen_window.label, 8, 'red')
+            else:
+                Controller.draw_border(view.label_stream, 4, 'red')
 
     # update the statusbar while streaming
     @staticmethod

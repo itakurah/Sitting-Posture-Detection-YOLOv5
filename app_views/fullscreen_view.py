@@ -10,6 +10,8 @@ class FullscreenView(QMainWindow):
         self.label = QLabel()
         desktop = QDesktopWidget()
         screen_rect = desktop.screenGeometry(desktop.primaryScreen())
+        self.label.setFixedWidth(screen_rect.width())
+        self.label.setFixedHeight(screen_rect.height())
         self.setGeometry(screen_rect)
         self.label.setStyleSheet('background-color: black;')
         self.label.setAlignment(Qt.AlignCenter)
@@ -23,5 +25,5 @@ class FullscreenView(QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape or event.key() == Qt.Key_Q:
-            self.close()
             self.fullscreen_closed.emit()
+            self.close()
