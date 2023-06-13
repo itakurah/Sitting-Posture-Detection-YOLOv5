@@ -57,7 +57,7 @@ class Controller():
 
     # update color for frame and buttons
     @staticmethod
-    def show_color_picker(view, button):
+    def show_color_picker(model, id, button):
         """
         Shows the color picker menu
 
@@ -72,14 +72,14 @@ class Controller():
             # set the background color of the button using stylesheet
             button.setStyleSheet(f'background-color: rgb({color.red()}, {color.green()}, {color.blue()});border: none')
             # update the original color tuple with the new RGB values
-            if button == view.button_color_box:
-                view.box_color = color_tuple
-            elif button == view.button_color_class:
-                view.text_color_class = color_tuple
-            elif button == view.button_color_confidence:
-                view.text_color_conf = color_tuple
-            elif button == view.button_color_bg:
-                view.text_color_bg = color_tuple
+            if id == 'color_box':
+                model.box_color = color_tuple
+            elif id == 'color_class':
+                model.text_color_class = color_tuple
+            elif id == 'color_conf':
+                model.text_color_conf = color_tuple
+            elif id == 'color_bg':
+                model.text_color_bg = color_tuple
 
     # on timeout stop button
     @staticmethod
