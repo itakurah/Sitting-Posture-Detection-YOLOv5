@@ -25,7 +25,7 @@ if __name__ == '__main__':
         sys.exit(1)
     elif len(sys.argv) == 1:
         print("Info: Loading default inference_models")
-        model_name = "model_l_best.pt"
+        model_name = "model_l_experimental.pt"
     else:
         model_name = sys.argv[1]
     style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
