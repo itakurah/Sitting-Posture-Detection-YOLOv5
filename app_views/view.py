@@ -51,6 +51,7 @@ class View(QMainWindow):
         self.label_stream.setFixedWidth(self.label_stream_width)
         self.label_stream.setFixedHeight(self.label_stream_height)
         self.label_stream.move(20, 50)
+        self.label_stream.setAlignment(Qt.AlignCenter)
         self.label_stream.setHidden(True)
 
         # fullscreen button
@@ -377,11 +378,14 @@ class View(QMainWindow):
         self.button_stop.clicked.connect(lambda: Controller.on_button_stop_clicked(self, model))
         self.timer_start.timeout.connect(lambda: Controller.timer_timeout_start(self))
         self.timer_stop.timeout.connect(lambda: Controller.timer_timeout_stop(self))
-        self.button_color_box.clicked.connect(lambda: Controller.show_color_picker(self, self.button_color_box))
-        self.button_color_class.clicked.connect(lambda: Controller.show_color_picker(self, self.button_color_class))
+        self.button_color_box.clicked.connect(
+            lambda: Controller.show_color_picker(model, 'color_box', self.button_color_box))
+        self.button_color_class.clicked.connect(
+            lambda: Controller.show_color_picker(model, 'color_class', self.button_color_class))
         self.button_color_confidence.clicked.connect(
-            lambda: Controller.show_color_picker(self, self.button_color_confidence))
-        self.button_color_bg.clicked.connect(lambda: Controller.show_color_picker(self, self.button_color_bg))
+            lambda: Controller.show_color_picker(model, 'color_conf', self.button_color_confidence))
+        self.button_color_bg.clicked.connect(
+            lambda: Controller.show_color_picker(model, 'color_bg', self.button_color_bg))
         self.button_reset_brightness.clicked.connect(lambda: self.slider_brightness.setValue(100))
         self.button_reset_contrast.clicked.connect(lambda: self.slider_contrast.setValue(100))
         self.button_rotate.clicked.connect(lambda: Controller.update_frame_rotation_degrees(model))
