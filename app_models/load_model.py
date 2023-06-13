@@ -16,10 +16,6 @@ class InferenceModel:
         self.model_name = model_name
         # path to inference_models
         self.model_path = Path('./data/inference_models/{}'.format(model_name))
-        print(self.model_path)
-        print(self.model_path.is_file())
-        directory = os.getcwd()
-        print(directory)
         print(self.model_name + ' loaded')
         print('cuda available: ' + str(torch.cuda.is_available()))
         if torch.cuda.is_available():
@@ -49,7 +45,7 @@ class InferenceModel:
                 sys.exit(-1)
         # inference_models properties
         self.model.conf = 0.50  # NMS confidence threshold
-        self.model.iou = 0.80  # NMS IoU threshold
+        self.model.iou = 0.50  # NMS IoU threshold
         self.model.classes = [0, 1]  # Only show these classes
         self.model.agnostic = False  # NMS class-agnostic
         self.model.multi_label = False  # NMS multiple labels per box
