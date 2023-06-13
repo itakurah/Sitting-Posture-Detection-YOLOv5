@@ -18,7 +18,7 @@ class FullscreenView(QMainWindow):
         self.setWindowState(Qt.WindowFullScreen)
 
     def set_central_widget_content(self, pixmap):
-        pixmap = pixmap.scaled(self.label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        pixmap = pixmap.scaled(self.label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
         if pixmap is not None:
             self.label.setPixmap(pixmap)
         self.setCentralWidget(self.label)
