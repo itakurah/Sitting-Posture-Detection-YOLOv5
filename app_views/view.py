@@ -11,6 +11,7 @@ from app_controllers.controller import Controller
 from app_controllers.utils.camera_helper import get_connected_camera_alias
 from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 from app_views.threads.worker_thread_system_resource import WorkerThreadSystemResource
+from app_controllers.utils.update_helper import is_update
 
 '''Class for creating the application app_views
 '''
@@ -24,7 +25,7 @@ class View(QMainWindow):
         self.gui_width = 870
         self.gui_height = 540
         self.model = model
-        self.setWindowTitle('Sitting Posture Detector (commit {})'.format(model.get_commit_hash()))
+        self.setWindowTitle('Sitting Posture Detector (commit {}) - {}'.format(model.get_commit_hash(), is_update()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
         self.setFixedSize(self.gui_width, self.gui_height)
         # Set icon
