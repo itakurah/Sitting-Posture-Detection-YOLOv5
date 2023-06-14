@@ -25,7 +25,7 @@ class View(QMainWindow):
         self.gui_width = 935
         self.gui_height = 560
         self.model = model
-        self.setWindowTitle('Sitting Posture Detector (commit {}) - {}'.format(model.get_commit_hash(), is_update()))
+        self.setWindowTitle('Sitting Posture Detector [commit {} - {}]'.format(model.get_commit_hash(), is_update()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
         self.setFixedSize(self.gui_width, self.gui_height)
         # Set icon
