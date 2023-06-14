@@ -22,8 +22,8 @@ class View(QMainWindow):
     def __init__(self, model):
         super().__init__()
         # window properties
-        self.gui_width = 870
-        self.gui_height = 540
+        self.gui_width = 935
+        self.gui_height = 560
         self.model = model
         self.setWindowTitle('Sitting Posture Detector (commit {}) - {}'.format(model.get_commit_hash(), is_update()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
@@ -47,8 +47,8 @@ class View(QMainWindow):
         # QLabel properties
         self.label_stream = QLabel(self)
         self.label_stream.setStyleSheet('border: 2px solid black; background-color: black;')
-        self.label_stream_width = 600
-        self.label_stream_height = 450
+        self.label_stream_width = 640
+        self.label_stream_height = 480
         self.label_stream.setFixedWidth(self.label_stream_width)
         self.label_stream.setFixedHeight(self.label_stream_height)
         self.label_stream.move(20, 50)
@@ -74,8 +74,6 @@ class View(QMainWindow):
         # start button properties
         button_start_width = 80
         button_start_height = 27
-        button_start_x = 225
-        button_start_y = 50
         self.button_start = QPushButton('Start', self)
         self.button_start.setToolTip('Start camera stream')
         self.button_start.setFixedHeight(button_start_height)
@@ -83,8 +81,6 @@ class View(QMainWindow):
         self.button_start.move(225, 19)
 
         # btn_stop
-        button_stop_x = 310
-        button_stop_y = 50
         self.button_stop = QPushButton('Stop', self)
         self.button_stop.setToolTip('Stop camera stream')
         self.button_stop.setFixedHeight(27)
@@ -95,8 +91,8 @@ class View(QMainWindow):
         self.groupbox_frame_options = QGroupBox(self)
         self.groupbox_frame_options.setTitle('General Options')
         self.groupbox_frame_options.setFixedHeight(self.label_stream_height)
-        self.groupbox_frame_options.setFixedWidth(230)
-        self.groupbox_frame_options.move(630, 50)
+        self.groupbox_frame_options.setFixedWidth(250)
+        self.groupbox_frame_options.move(665, 50)
 
         # flip horizontal button
         self.button_flip_horizontal = QPushButton('', self.groupbox_frame_options)
@@ -147,7 +143,7 @@ class View(QMainWindow):
         self.button_group.addButton(self.radiobutton_tr, 4)
 
         # checkbox properties
-        self.cbox_enable_bbox = QCheckBox('Bounding Box', self.groupbox_frame_options)
+        self.cbox_enable_bbox = QCheckBox('Bounding box', self.groupbox_frame_options)
         self.cbox_enable_bbox.move(10, 110)
         self.cbox_enable_bbox.setToolTip('Enable/Disable bounding box')
         self.cbox_enable_class = QCheckBox('Class', self.groupbox_frame_options)
@@ -213,10 +209,10 @@ class View(QMainWindow):
         self.button_color_bg.setStyleSheet(
             f"background-color: rgb({model.text_color_bg[0]}, {model.text_color_bg[1]}, {model.text_color_bg[2]});border: none")
 
-        self.cbox_enable_debug = QCheckBox('Debug Info', self.groupbox_frame_options)
-        self.cbox_enable_debug.move(10, 400)
-        self.cbox_enable_debug.setToolTip('Enable/Disable debug information in the status bar')
-        self.cbox_enable_debug.setChecked(True)
+        self.checkbox_enable_debug = QCheckBox('Debug info', self.groupbox_frame_options)
+        self.checkbox_enable_debug.move(10, 400)
+        self.checkbox_enable_debug.setToolTip('Enable/Disable debug information in the status bar')
+        self.checkbox_enable_debug.setChecked(True)
 
         # slider properties - brightness
         self.label_brightness_control = QLabel('Brightness:', self.groupbox_frame_options)
@@ -255,6 +251,11 @@ class View(QMainWindow):
         self.button_reset_contrast.setFixedHeight(20)
         self.button_reset_contrast.move(150, 312)
         self.button_reset_brightness.move(150, 267)
+
+        self.checkbox_switch_bbox_mode = QCheckBox('Default bounding box color', self.groupbox_frame_options)
+        self.checkbox_switch_bbox_mode.move(10, 430)
+        self.checkbox_switch_bbox_mode.setToolTip('Enable/Disable default bounding box color')
+        self.checkbox_switch_bbox_mode.setChecked(True)
 
         # start memory thread
         self.worker_thread_memory = WorkerThreadSystemResource()
@@ -367,7 +368,7 @@ class View(QMainWindow):
                                                                                                              '/fullscreen_icon'
                                                                                                              '.png'))
 
-        self.cbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
+        self.checkbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
         self.slider_brightness.valueChanged.connect(
             lambda: Controller.update_slider_text(self.slider_brightness, self.label_brightness_control))
         self.slider_contrast.valueChanged.connect(
@@ -393,6 +394,7 @@ class View(QMainWindow):
         self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
         self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
         self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
+        self.checkbox_switch_bbox_mode.stateChanged.connect(lambda: Controller.set_bbox_mode(self, model))
 
     def closeEvent(self, event):
         Controller.stop_worker_thread_camera(self.model)
