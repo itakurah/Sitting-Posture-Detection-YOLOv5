@@ -4,7 +4,7 @@ import cv2
 import psutil
 from IPython.external.qt_for_kernel import QtCore
 from PyQt5.QtCore import QDateTime, Qt, QTimer
-from PyQt5.QtGui import QIcon, QImage, QPixmap, QColor, QPainter
+from PyQt5.QtGui import QIcon, QImage, QPixmap
 from PyQt5.QtWidgets import QColorDialog, QDesktopWidget
 
 from app_controllers.utils import camera_helper
@@ -176,10 +176,17 @@ class Controller():
     def draw_border(label, size, color):
         label.setStyleSheet('border: {}px solid {};background-color: black;'.format(size, color))
 
+    @staticmethod
+    def set_bbox_mode(view, model):
+        if view.checkbox_switch_bbox_mode.isChecked():
+            model.bbox_mode = 1
+        else:
+            model.bbox_mode = 0
+
     # show or hide debug features
     @staticmethod
     def set_debug_mode(view):
-        if view.cbox_enable_debug.isChecked():
+        if view.checkbox_enable_debug.isChecked():
             view.label_fps.setHidden(False)
             view.label_class_info.setHidden(False)
             view.label_conf.setHidden(False)
@@ -298,14 +305,16 @@ class Controller():
     # draw items on frame
     @staticmethod
     def draw_items(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name, confidence):
-        Controller.draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2)
+        Controller.draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name)
         Controller.draw_information(model, view, frame, class_name, confidence)
 
     # draw bounding box on frame
     @staticmethod
-    def draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2):
+    def draw_bounding_box(model, view, frame, bbox_x1, bbox_y1, bbox_x2, bbox_y2, class_name):
         if view.cbox_enable_bbox.isChecked():
-            cv2.rectangle(frame, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), model.box_color, model.box_thickness)
+            cv2.rectangle(frame, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2),
+                          model.box_color if model.bbox_mode == 0 else (0, 128, 0) if class_name == 0 else (255, 0, 0),
+                          model.box_thickness)
 
     # draw class name on frame
     @staticmethod

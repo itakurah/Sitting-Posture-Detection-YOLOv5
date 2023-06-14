@@ -56,6 +56,7 @@ class Model:
         self.frame_rotation = 0
         self.frame_orientation_vertical = 0
         self.frame_orientation_horizontal = 0
+        self.bbox_mode = 1
 
     def get_commit_hash(self):
         return self.commit_hash
