@@ -9,6 +9,6 @@ def is_update():
     try:
         with urllib.request.urlopen(url) as response:
             file_contents = response.read().decode('utf-8')
-        return 'Update available' if commit_hash != file_contents else 'Latest version'
+        return 'update available' if commit_hash != file_contents else 'latest version'
     except urllib.error.URLError:
-        return 'Could not check for updates'
+        return 'update check error'
