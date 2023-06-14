@@ -13,8 +13,7 @@ from app_views.threads.worker_thread_frame import WorkerThreadFrame
 from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 
 
-class Controller():
-
+class Controller:
     def __init__(self, model, view):
         super().__init__()
         self.model = model
@@ -25,6 +24,7 @@ class Controller():
         view.timer_statusbar_idle.start(2000)
         view.timer_statusbar_idle.timeout.connect(lambda: self.check_idle_time(view, model))
         view.status_bar.messageChanged.connect(lambda: self.update_last_update_time(model))
+        self.set_start_button_visibility(view, model)
 
     @staticmethod
     def show_fullscreen(model):
@@ -114,17 +114,20 @@ class Controller():
         view.button_stop.setEnabled(False)
         # workaround to process the stack otherwise it will ignore the statements above
         QtCore.QCoreApplication.processEvents()
+        Controller.set_start_button_visibility(view, model)
+        QtCore.QCoreApplication.processEvents()
+
+    @staticmethod
+    def set_start_button_visibility(view, model):
         if camera_helper.is_camera_connected():
             Controller.update_combobox_camera_list_items(view, model)
             view.button_start.setEnabled(True)
+            view.combobox_camera_list.setEnabled(True)
         else:
             view.button_start.setEnabled(False)
-        view.combobox_camera_list.setEnabled(True)
+            view.combobox_camera_list.setEnabled(False)
         view.button_stop.setEnabled(False)
-        QtCore.QCoreApplication.processEvents()
-
     # update combobox items
-
     @staticmethod
     def update_combobox_camera_list_items(view, model):
         view.status_bar.showMessage('Updating camera list..')
