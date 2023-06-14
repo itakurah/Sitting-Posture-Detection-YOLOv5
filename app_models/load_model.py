@@ -30,18 +30,17 @@ class InferenceModel:
             # load inference_models into memory
             try:
                 self.model = yolov5.load(str(self.model_path), device=str(cuda))
-                # self.inference_models = torch.hub.load('ultralytics/yolov5', 'custom', str(self.model_path))
-            except Exception:
-                print('Model not found')
-
+            except Exception as e:
+                print(e)
+                print('Could not load model')
                 sys.exit(-1)
         else:
             print('running CPU inference..')
             try:
-                # self.inference_models = torch.hub.load('ultralytics/yolov5', 'custom', str(self.model_path))
                 self.model = yolov5.load(str(self.model_path), device='cpu')
-            except Exception:
-                print('Model not found')
+            except Exception as e:
+                print(e)
+                print('Could not load model')
                 sys.exit(-1)
         # inference_models properties
         self.model.conf = 0.50  # NMS confidence threshold
