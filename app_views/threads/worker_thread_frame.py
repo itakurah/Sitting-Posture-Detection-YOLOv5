@@ -51,8 +51,8 @@ class WorkerThreadFrame(QtCore.QThread):
             self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
             # change contrast based on slider value
             self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
-            self.check_rotation()
             self.check_orientation()
+            self.check_rotation()
             # predict using inference_models
             results = self.inference_model.predict(self.frame)
             self.update_camera.emit(self.model, self.view, self.frame, fps, results)
