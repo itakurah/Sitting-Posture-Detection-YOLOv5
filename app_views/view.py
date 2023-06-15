@@ -9,9 +9,10 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioBut
 
 from app_controllers.controller import Controller
 from app_controllers.utils.camera_helper import get_connected_camera_alias
+from app_controllers.utils.update_helper import is_update
+from app_views.about_view import AboutWindow
 from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 from app_views.threads.worker_thread_system_resource import WorkerThreadSystemResource
-from app_controllers.utils.update_helper import is_update
 
 '''Class for creating the application app_views
 '''
@@ -24,6 +25,8 @@ class View(QMainWindow):
         # window properties
         self.gui_width = 935
         self.gui_height = 560
+        # element x coordinate
+        self.button_line_x = 15
         self.model = model
         self.setWindowTitle('Sitting Posture Detector [commit {} - {}]'.format(model.get_commit_hash(), is_update()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
@@ -40,9 +43,9 @@ class View(QMainWindow):
 
         self.combobox_camera_list = QComboBox(self)
         self.combobox_camera_list.addItems(get_connected_camera_alias())
-        self.combobox_camera_list.move(20, 20)
+        self.combobox_camera_list.move(20, self.button_line_x)
         self.combobox_camera_list.setFixedWidth(200)
-        self.combobox_camera_list.setFixedHeight(25)
+        self.combobox_camera_list.setFixedHeight(28)
 
         # QLabel properties
         self.label_stream = QLabel(self)
@@ -72,20 +75,34 @@ class View(QMainWindow):
         self.label_no_camera.move(20, 50)
 
         # start button properties
-        button_start_width = 80
-        button_start_height = 27
         self.button_start = QPushButton('Start', self)
-        self.button_start.setToolTip('Start camera stream')
-        self.button_start.setFixedHeight(button_start_height)
-        self.button_start.setFixedWidth(button_start_width)
-        self.button_start.move(225, 19)
+        self.button_start.setFixedHeight(29)
+        self.button_start.setFixedWidth(80)
+        self.button_start.move(225, self.button_line_x)
 
-        # btn_stop
+        # stop button properties
         self.button_stop = QPushButton('Stop', self)
-        self.button_stop.setToolTip('Stop camera stream')
-        self.button_stop.setFixedHeight(27)
+        self.button_stop.setFixedHeight(29)
         self.button_stop.setFixedWidth(80)
-        self.button_stop.move(310, 19)
+        self.button_stop.move(310, self.button_line_x)
+
+        # refresh button properties
+        self.button_refresh = QPushButton('', self)
+        self.button_refresh.setToolTip('Refresh camera list')
+        self.button_refresh.setFixedHeight(28)
+        self.button_refresh.setFixedWidth(28)
+        self.button_refresh.move(395, self.button_line_x)
+        self.button_refresh.setIcon(QIcon('data/images/refresh.png'))
+        self.button_refresh.setIconSize(QSize(22, 22))
+
+        # info button properties
+        self.button_information = QPushButton('', self)
+        size = 20
+        self.button_information.setFixedHeight(size)
+        self.button_information.setFixedWidth(size)
+        self.button_information.move(895, self.button_line_x + 4)
+        self.button_information.setIcon(QIcon('data/images/information.png'))
+        self.button_information.setIconSize(QSize(15, 15))
 
         # groupbox properties
         self.groupbox_frame_options = QGroupBox(self)
@@ -284,46 +301,75 @@ class View(QMainWindow):
                                                    'font-size: 10px;}'
                                                    'QPushButton:enabled {'
                                                    'background-color: #4269b9;'
-                                                   'border: 1px solid white;}')
+                                                   'border: 1px solid white;}'
+                                                   'QPushButton:enabled:hover {'
+                                                   'background-color: #2c4f7a;}'
+                                                   )
         self.button_reset_contrast.setStyleSheet('QPushButton {'
                                                  'font-size: 10px;}'
                                                  'QPushButton:enabled {'
                                                  'background-color: #4269b9;'
-                                                 'border: 1px solid white;}')
+                                                 'border: 1px solid white;}'
+                                                 'QPushButton:enabled:hover {'
+                                                 'background-color: #2c4f7a;}'
+                                                 )
         self.button_rotate.setStyleSheet('QPushButton {'
                                          'font-size: 10px;}'
                                          'QPushButton:enabled {'
                                          'background-color: #4269b9;'
                                          'border: 1px solid white;}'
+                                         'QPushButton:enabled:hover {'
+                                         'background-color: #2c4f7a;}'
                                          'QToolTip {background-color: #323844; font-weight: bold; }')
         self.button_flip_horizontal.setStyleSheet('QPushButton {'
                                                   'font-size: 10px;}'
                                                   'QPushButton:enabled {'
                                                   'background-color: #4269b9;'
                                                   'border: 1px solid white;}'
+                                                  'QPushButton:enabled:hover {'
+                                                  'background-color: #2c4f7a;}'
                                                   'QToolTip {background-color: #323844; font-weight: bold; }')
         self.button_flip_vertical.setStyleSheet('QPushButton {'
                                                 'font-size: 10px;}'
                                                 'QPushButton:enabled {'
                                                 'background-color: #4269b9;'
                                                 'border: 1px solid white;}'
+                                                'QPushButton:enabled:hover {'
+                                                'background-color: #2c4f7a;}'
                                                 'QToolTip {background-color: #323844; font-weight: bold; }')
+        self.button_refresh.setStyleSheet(f'QPushButton:enabled {{'
+                                          f'background-color: #4269b9;'
+                                          f'border-radius : {28 / 2};'
+                                          f'background-color: #4269b9;'
+                                          f'border: 1px solid white;}}'
+                                          f'QPushButton:disabled {{'
+                                          f'border-radius : {28 / 2};'
+                                          f'border: 1px solid white;}}'
+                                          f'QPushButton:enabled:hover {{'
+                                          f'background-color: #2c4f7a;}}'
+                                          f'QToolTip {{background-color: #323844; font-weight: bold; }}')
+        self.button_information.setStyleSheet(f'QPushButton {{'
+                                              f'background-color: #4269b9;'
+                                              f'border-radius : {size / 2};'
+                                              f'border: none;}}'
+                                              f'QPushButton:enabled:hover {{'
+                                              f'background-color: #2c4f7a;}}'
+                                              f'QToolTip {{background-color: #323844; font-weight: bold;}}')
+
         self.button_start.setStyleSheet('QPushButton:enabled {'
                                         'background-color: #4269b9;'
                                         'border: 1px solid white;}'
-                                        'QPushButton:disabled,'
-                                        'QPushButton:disabled:hover {'
-                                        'background-color: #323844;}'
+                                        'QPushButton:enabled:hover {'
+                                        'background-color: #2c4f7a;}'
                                         'QToolTip {background-color: #323844;'
                                         ' font-weight: bold; }')
         self.button_stop.setStyleSheet('QPushButton:enabled {'
                                        'background-color: #4269b9;'
                                        'border: 1px solid white;}'
-                                       'QPushButton:disabled,'
-                                       'QPushButton:disabled:hover {'
-                                       'background-color: #323844;}'
+                                       'QPushButton:enabled:hover {'
+                                       'background-color: #2c4f7a;}'
                                        'QToolTip {background-color: #323844;'
-                                       'font-weight: bold; }')
+                                       ' font-weight: bold; }')
         self.button_fullscreen.setStyleSheet('QPushButton:enabled {'
                                              'background-color: transparent;'
                                              'border: none;}'
@@ -367,6 +413,22 @@ class View(QMainWindow):
                                                                                                              '/images'
                                                                                                              '/fullscreen_icon'
                                                                                                              '.png'))
+        self.button_refresh.pressed.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
+                                                                                                      '/images'
+                                                                                                      '/refresh_pressed'
+                                                                                                      '.png'))
+        self.button_refresh.released.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
+                                                                                                       '/images'
+                                                                                                       '/refresh'
+                                                                                                       '.png'))
+        self.button_information.pressed.connect(lambda: Controller.on_button_pressed(self.button_information, 'data'
+                                                                                                              '/images'
+                                                                                                              '/information_pressed'
+                                                                                                              '.png'))
+        self.button_information.released.connect(lambda: Controller.on_button_pressed(self.button_information, 'data'
+                                                                                                               '/images'
+                                                                                                               '/information'
+                                                                                                               '.png'))
 
         self.checkbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
         self.slider_brightness.valueChanged.connect(
@@ -394,7 +456,10 @@ class View(QMainWindow):
         self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
         self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
         self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
+        self.button_refresh.clicked.connect(lambda: Controller.update_combobox_camera_list_items(self, model))
         self.checkbox_switch_bbox_mode.stateChanged.connect(lambda: Controller.set_bbox_mode(self, model))
+        self.view_about = AboutWindow(self, model)
+        self.button_information.clicked.connect(lambda: Controller.show_about_view(self))
 
     def closeEvent(self, event):
         Controller.stop_worker_thread_camera(self.model)
