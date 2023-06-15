@@ -27,6 +27,10 @@ class Controller:
         self.set_start_button_visibility(view, model)
 
     @staticmethod
+    def show_about_view(view):
+        view.view_about.show()
+
+    @staticmethod
     def show_fullscreen(model):
         model.is_fullscreen = True
         model.fullscreen_window.showFullScreen()
@@ -90,6 +94,7 @@ class Controller:
         # stop timer and toggle button state
         view.timer_stop.stop()
         if not view.button_stop.isEnabled():
+            view.button_refresh.setEnabled(True)
             view.button_start.setEnabled(True)
             view.combobox_camera_list.setEnabled(True)
 
@@ -108,14 +113,13 @@ class Controller:
     # update combobox items with current available cameras
     @staticmethod
     def on_combobox_camera_list_changed(view, model):
-        QtCore.QCoreApplication.processEvents()
         view.combobox_camera_list.setEnabled(False)
         view.button_start.setEnabled(False)
         view.button_stop.setEnabled(False)
+        view.button_refresh.setEnabled(False)
         # workaround to process the stack otherwise it will ignore the statements above
         QtCore.QCoreApplication.processEvents()
         Controller.set_start_button_visibility(view, model)
-        QtCore.QCoreApplication.processEvents()
 
     @staticmethod
     def set_start_button_visibility(view, model):
@@ -127,16 +131,19 @@ class Controller:
             view.button_start.setEnabled(False)
             view.combobox_camera_list.setEnabled(False)
         view.button_stop.setEnabled(False)
+
     # update combobox items
     @staticmethod
     def update_combobox_camera_list_items(view, model):
+        view.button_start.setEnabled(False)
+        view.button_refresh.setEnabled(False)
+        view.combobox_camera_list.setEnabled(False)
         view.status_bar.showMessage('Updating camera list..')
         QtCore.QCoreApplication.processEvents()
         view.combobox_camera_list.currentTextChanged.disconnect()
         text = view.combobox_camera_list.currentText()
         model.camera_mapping = camera_helper.get_camera_mapping(camera_helper.get_connected_camera_alias(),
                                                                 camera_helper.get_connected_camera_ids())
-
         view.combobox_camera_list.clear()
         view.combobox_camera_list.addItems(model.camera_mapping.keys())
         index = view.combobox_camera_list.findText(text, QtCore.Qt.MatchFixedString)
@@ -144,6 +151,9 @@ class Controller:
             view.combobox_camera_list.setCurrentIndex(index)
         view.combobox_camera_list.currentTextChanged.connect(
             lambda: Controller.on_combobox_camera_list_changed(view, model))
+        view.button_refresh.setEnabled(True)
+        view.button_start.setEnabled(True)
+        view.combobox_camera_list.setEnabled(True)
 
     # update memory and cpu usage in statusbar
     @staticmethod
@@ -234,6 +244,7 @@ class Controller:
         # disable gui elements
         view.label_stream.setHidden(False)
         view.button_start.setEnabled(False)
+        view.button_refresh.setEnabled(False)
         view.combobox_camera_list.setEnabled(False)
         # start timer
         view.timer_start.start(2000)
