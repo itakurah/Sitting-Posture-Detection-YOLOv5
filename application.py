@@ -9,6 +9,7 @@ from app_controllers.controller import Controller
 from app_models.model import Model
 from app_views.view import View
 
+model_name = "model_l320_experimental.pt"
 
 class App:
     def __init__(self):
@@ -24,8 +25,7 @@ if __name__ == '__main__':
         print("Error: Exactly one argument is expected")
         sys.exit(1)
     elif len(sys.argv) == 1:
-        print("Info: Loading default inference_models")
-        model_name = "model_l_experimental.pt"
+        print("Info: Loading default inference model: {}".format(model_name))
     else:
         model_name = sys.argv[1]
     style = '''<!--?xml version="1.0" encoding="UTF-8"?-->

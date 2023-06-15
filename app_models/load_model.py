@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -7,8 +6,6 @@ import yolov5
 
 '''Class for loading the Yolo-v5 inference_models
 '''
-
-MODEL_NAME = 'model_s_best.pt'
 
 
 class InferenceModel:
