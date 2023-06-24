@@ -1,8 +1,8 @@
-# Posture Detector using YOLOv5
+# Posture Detection using YOLOv5
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/screenshot.png" width=80% height=80%>
 
-This GitHub repository contains a posture detection program that utilizes YOLOv5, an advanced object detection algorithm, to detect and predict sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
+This GitHub repository contains a posture detection program that utilizes [YOLOv5](https://github.com/ultralytics/yolov5), an advanced object detection algorithm, to detect and predict sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
 
 Key Features:
 
@@ -49,11 +49,24 @@ If you have an NVIDIA graphics processor, you can activate GPU acceleration by i
 `python application.py <optional: model_file.pt>` **OR** `python3 application.py <optional: model_file.pt>`
 
 The default model is loaded if no model file is specified.
+
+# Model
+The program uses a custom trained [YOLOv5l](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5l.yaml) model that is trained on about 160 images per class. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
+## Architecture
+The architecture that is used for the model is the standard YOLOv5 architecture:
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=70% height=70%>
+*Fig. 1: The architecture of the YOLOv5 model, which consists of three parts: (i) Backbone: CSPDarknet, (ii) Neck: PANet, and (iii) Head: YOLO Layer. The data are initially input to CSPDarknet for feature extraction and subsequently fed to PANet for feature fusion. Lastly, the YOLO Layer outputs the object detection results (i.e., class, score, location, size)*
+
 # About
 
 This project was developed by Niklas Hoefflin, Tim Spulak,
 Pascal Gerber & Jan Bösch and supervised by André Jeworutzki
 and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg.de/project/TLAM/) module.
+
+# Sources
+
+ - Jocher, G. (2020). YOLOv5 by Ultralytics (Version 7.0) [Computer software]. https://doi.org/10.5281/zenodo.3908559
+ - Fig. 1: TraCon: A novel dataset for real-time traffic cones detection using deep learning - Scientific Figure on ResearchGate. Available from: https://www.researchgate.net/figure/The-architecture-of-the-YOLOv5-model-which-consists-of-three-parts-i-Backbone_fig1_360834230 [accessed 24 Jun, 2023]
 
 # License
 
@@ -62,3 +75,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 <!-- MARKDOWN LINKS & IMAGES -->
 
 [Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
+
