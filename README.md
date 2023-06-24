@@ -1,3 +1,4 @@
+
 # Posture Detection using YOLOv5
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/screenshot.png" width=80% height=80%>
@@ -57,7 +58,39 @@ The architecture that is used for the model is the standard YOLOv5 architecture:
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=75% height=75%>
 
+
+
 *Fig. 1: The architecture of the YOLOv5 model, which consists of three parts: (i) Backbone: CSPDarknet, (ii) Neck: PANet, and (iii) Head: YOLO Layer. The data are initially input to CSPDarknet for feature extraction and subsequently fed to PANet for feature fusion. Lastly, the YOLO Layer outputs the object detection results (i.e., class, score, location, size)*
+
+## Model Results
+The validation set contains 800 images (280 sitting_good, 520 sitting_bad). The results are as follows:
+|Class|Images|Instances|Precision|Recall|mAP50|mAP50-95|
+|--|--|--|--|--|--|--|
+|all| 800 | 800 | 0.828 | 0.91 | 0.903 | 0.756 |
+|sitting_good| 800 |  280| 0.72 | 0.964 | 0.851 |0.725  |
+|sitting_bad| 800 | 520 | 0.937 | 0.856 | 0.955 | 0.786 |
+
+Detailed graphs:
+
+F1-Confidence Curve:
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/f1_curve.png" width=50% height=50%>
+
+Precision-Confidence Curve:
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/P_curve.png" width=50% height=50%>
+
+Recall-Confidence Curve:
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/R_curve.png" width=50% height=50%>
+
+Precision-Recall Curve:
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/PR_curve.png" width=50% height=50%>
+
+Confusion Matrix:
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/confusion_matrix.png" width=50% height=50%>
 
 # About
 
@@ -77,4 +110,3 @@ This project is licensed under the MIT License. See the LICENSE file for details
 <!-- MARKDOWN LINKS & IMAGES -->
 
 [Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
-
