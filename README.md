@@ -74,7 +74,7 @@ Detailed graphs:
 
 F1-Confidence Curve:
 
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/f1_curve.png" width=50% height=50%>
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/F1_curve.png" width=50% height=50%>
 
 Precision-Confidence Curve:
 
