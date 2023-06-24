@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 
 '''Class for handling frame manipulation 

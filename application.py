@@ -9,7 +9,8 @@ from app_controllers.controller import Controller
 from app_models.model import Model
 from app_views.view import View
 
-model_name = "model_l320_experimental.pt"
+model_name = "model_l640_best.pt"
+
 
 class App:
     def __init__(self):

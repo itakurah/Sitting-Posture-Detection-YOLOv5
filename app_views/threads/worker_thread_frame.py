@@ -1,5 +1,6 @@
 import time
 
+import cv2
 from PyQt5 import QtCore
 
 from app_controllers.utils.frame_helper import *
