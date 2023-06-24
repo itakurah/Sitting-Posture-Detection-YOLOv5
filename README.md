@@ -54,7 +54,9 @@ The default model is loaded if no model file is specified.
 The program uses a custom trained [YOLOv5l](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5l.yaml) model that is trained on about 160 images per class. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
 ## Architecture
 The architecture that is used for the model is the standard YOLOv5 architecture:
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=70% height=70%>
+
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=75% height=75%>
+
 *Fig. 1: The architecture of the YOLOv5 model, which consists of three parts: (i) Backbone: CSPDarknet, (ii) Neck: PANet, and (iii) Head: YOLO Layer. The data are initially input to CSPDarknet for feature extraction and subsequently fed to PANet for feature fusion. Lastly, the YOLO Layer outputs the object detection results (i.e., class, score, location, size)*
 
 # About
