@@ -9,7 +9,7 @@ from app_controllers.controller import Controller
 from app_models.model import Model
 from app_views.view import View
 
-model_name = "model_l640_best.pt"
+model_name = "small640.pt"
 
 
 class App:
