@@ -66,9 +66,9 @@ The architecture that is used for the model is the standard YOLOv5 architecture:
 The validation set contains 800 images (280 sitting_good, 520 sitting_bad). The results are as follows:
 |Class|Images|Instances|Precision|Recall|mAP50|mAP50-95|
 |--|--|--|--|--|--|--|
-|all| 800 | 800 | 0.828 | 0.91 | 0.903 | 0.756 |
-|sitting_good| 800 |  280| 0.72 | 0.964 | 0.851 |0.725  |
-|sitting_bad| 800 | 520 | 0.937 | 0.856 | 0.955 | 0.786 |
+|all| 800 | 800 | 0.87 | 0.939 | 0.931 | 0.734 |
+|sitting_good| 800 |  280| 0.884 | 0.954 | 0.908 |0.744  |
+|sitting_bad| 800 | 520 | 0.855 | 0.925 | 0.953 | 0.724 |
 
 Detailed graphs:
 
