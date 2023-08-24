@@ -63,12 +63,12 @@ The architecture that is used for the model is the standard YOLOv5 architecture:
 *Fig. 1: The architecture of the YOLOv5 model, which consists of three parts: (i) Backbone: CSPDarknet, (ii) Neck: PANet, and (iii) Head: YOLO Layer. The data are initially input to CSPDarknet for feature extraction and subsequently fed to PANet for feature fusion. Lastly, the YOLO Layer outputs the object detection results (i.e., class, score, location, size)*
 
 ## Model Results
-The validation set contains 800 images (280 sitting_good, 520 sitting_bad). The results are as follows:
+The validation set contains 80 images (40 sitting_good, 40 sitting_bad). The results are as follows:
 |Class|Images|Instances|Precision|Recall|mAP50|mAP50-95|
 |--|--|--|--|--|--|--|
-|all| 800 | 800 | 0.87 | 0.939 | 0.931 | 0.734 |
-|sitting_good| 800 |  280| 0.884 | 0.954 | 0.908 |0.744  |
-|sitting_bad| 800 | 520 | 0.855 | 0.925 | 0.953 | 0.724 |
+|all| 80 | 80 | 0.87 | 0.939 | 0.931 | 0.734 |
+|sitting_good| 40 |  40| 0.884 | 0.954 | 0.908 |0.744  |
+|sitting_bad| 80 | 40 | 0.855 | 0.925 | 0.953 | 0.724 |
 
 Detailed graphs:
 
