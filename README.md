@@ -1,13 +1,16 @@
 
+
 # Posture Detection using YOLOv5
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/posture.webp" width=80% height=80%>
 
-This GitHub repository contains a posture detection program that utilizes [YOLOv5](https://github.com/ultralytics/yolov5), an advanced object detection algorithm, to detect and predict sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
+**Source: https://www.youtube.com/watch?v=HNgTLml_Zi4*
+
+This GitHub repository contains a posture detection program that utilizes [YOLOv5](https://github.com/ultralytics/yolov5), an advanced object detection algorithm, to detect and predict lateral sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
 
 Key Features:
 
-* YOLOv5: The program leverages the power of YOLOv5, which is a state-of-the-art object detection algorithm, to
+* YOLOv5: The program leverages the power of YOLOv5, which is an object detection algorithm, to
   accurately detect the user's sitting posture from a webcam.
 * Real-time Posture Detection: The program provides real-time feedback on the user's sitting posture, making it suitable
   for use in applications such as office ergonomics, fitness, and health monitoring.
@@ -52,7 +55,7 @@ If you have an NVIDIA graphics processor, you can activate GPU acceleration by i
 The default model is loaded if no model file is specified.
 
 # Model
-The program uses a custom trained [YOLOv5l](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5l.yaml) model that is trained on about 160 images per class. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
+The program uses a custom trained [YOLOv5s](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5s.yaml) model that is trained on about 160 images per class for 146 epochs. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
 ## Architecture
 The architecture that is used for the model is the standard YOLOv5 architecture:
 
