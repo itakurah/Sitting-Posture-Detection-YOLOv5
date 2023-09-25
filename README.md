@@ -97,8 +97,8 @@ Confusion Matrix:
 
 # About
 
-This project was developed by Niklas Hoefflin, Tim Spulak,
-Pascal Gerber & Jan Bösch and supervised by André Jeworutzki
+This project was developed by [Niklas Hoefflin](https://github.com/itakurah), [Tim Spulak](https://github.com/T-Lak),
+Pascal Gerber & Jan Bösch and supervised by [André Jeworutzki](https://github.com/AndreJeworutzki)
 and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg.de/project/TLAM/) module.
 
 # Sources
