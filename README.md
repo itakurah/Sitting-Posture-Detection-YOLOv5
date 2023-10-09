@@ -1,6 +1,4 @@
-
-
-# Posture Detection using YOLOv5
+# Sitting Posture Detection using YOLOv5
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/posture.webp" width="80%" height="80%" alt="Sitting Posture"> 
