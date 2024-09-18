@@ -59,13 +59,13 @@ The default model is loaded if no model file is specified.
 # Model
 The program uses a custom trained [YOLOv5s](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5s.yaml) model that is trained on about 160 images per class for 146 epochs. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
 ## Architecture
-The architecture that is used for the model is the standard YOLOv5 architecture:
+The architecture that is used for the model is the standard YOLOv5s architecture:
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=75% height=75%>
 
 
 
-*Fig. 1: The architecture of the YOLOv5 model, which consists of three parts: (i) Backbone: CSPDarknet, (ii) Neck: PANet, and (iii) Head: YOLO Layer. The data are initially input to CSPDarknet for feature extraction and subsequently fed to PANet for feature fusion. Lastly, the YOLO Layer outputs the object detection results (i.e., class, score, location, size)*
+*Fig. 1: YOLOv5s network architecture (based on Liu et al.). The CBS module consists of a Convolutional layer, a Batch Normalization layer, and a Sigmoid Linear Unit (SiLU) activation function. The C3 module consists of three CBS modules and one bottleneck block. The SPPF module consists of two CBS modules and three Max Pooling layers.*
 
 ## Model Results
 The validation set contains 80 images (40 sitting_good, 40 sitting_bad). The results are as follows:
@@ -75,27 +75,14 @@ The validation set contains 80 images (40 sitting_good, 40 sitting_bad). The res
 |sitting_good| 40 |  40| 0.884 | 0.954 | 0.908 |0.744  |
 |sitting_bad| 80 | 40 | 0.855 | 0.925 | 0.953 | 0.724 |
 
-Detailed graphs:
+F1, Precision, Recall, and Precision-Recall plots:
 
-F1-Confidence Curve:
-
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/F1_curve.png" width=50% height=50%>
-
-Precision-Confidence Curve:
-
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/P_curve.png" width=50% height=50%>
-
-Recall-Confidence Curve:
-
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/R_curve.png" width=50% height=50%>
-
-Precision-Recall Curve:
-
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/PR_curve.png" width=50% height=50%>
-
-Confusion Matrix:
-
-<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/confusion_matrix.png" width=50% height=50%>
+<p align="middle">
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/F1_curve.png" width=40% height=40%>
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/P_curve.png" width=40% height=40%>
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/R_curve.png" width=40% height=40%>
+<img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/PR_curve.png" width=40% height=40%>
+</p>
 
 # About
 
@@ -105,8 +92,10 @@ and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg
 
 # Sources
 
- - Jocher, G. (2020). YOLOv5 by Ultralytics (Version 7.0) [Computer software]. https://doi.org/10.5281/zenodo.3908559
- - Fig. 1: TraCon: A novel dataset for real-time traffic cones detection using deep learning - Scientific Figure on ResearchGate. Available from: https://www.researchgate.net/figure/The-architecture-of-the-YOLOv5-model-which-consists-of-three-parts-i-Backbone_fig1_360834230 [accessed 24 Jun, 2023]
+ - Jocher, G. (2020). YOLOv5 by Ultralytics (Version 7.0). https://doi.org/10.5281/zenodo.3908559
+ - Fig. 1: H. Liu, F. Sun, J. Gu, and L. Deng, “Sf-yolov5: A lightweight small
+object detection algorithm based on improved feature fusion mode,”
+Sensors (Basel, Switzerland), vol. 22, no. 15, pp. 1–14, 2022. https://doi.org/10.3390/s22155817
 
 # License
 
