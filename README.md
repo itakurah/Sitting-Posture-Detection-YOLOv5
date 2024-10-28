@@ -1,4 +1,4 @@
-# Lateral Sitting Posture Detection using YOLOv5
+# Real-Time Lateral Sitting Posture Detection using YOLOv5
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/posture.webp" width="80%" height="80%" alt="Sitting Posture"> 
@@ -8,22 +8,27 @@
 
 
 
-This GitHub repository contains a posture detection program that utilizes [YOLOv5](https://github.com/ultralytics/yolov5), an advanced object detection algorithm, to detect and predict lateral sitting postures. The program is designed to analyze the user's sitting posture in real-time and provide feedback on whether the posture is good or bad based on predefined criteria. The goal of this project is to promote healthy sitting habits and prevent potential health issues associated with poor posture.
+This repository provides an open-source solution for **real-time sitting posture detection** using [YOLOv5](https://github.com/ultralytics/yolov5), a state-of-the-art object detection algorithm. The program is designed to analyze a user’s sitting posture and offer feedback on whether it aligns with ergonomic best practices, aiming to promote healthier sitting habits.
 
-Key Features:
+## Key Features
 
-* YOLOv5: The program leverages the power of YOLOv5, which is an object detection algorithm, to
-  accurately detect the user's sitting posture from a webcam.
-* Real-time Posture Detection: The program provides real-time feedback on the user's sitting posture, making it suitable
-  for use in applications such as office ergonomics, fitness, and health monitoring.
-* Good vs. Bad Posture Classification: The program uses a pre-trained model to classify the detected posture as good or
-  bad, enabling users to improve their posture and prevent potential health issues associated with poor sitting habits.
-* Open-source: The program is released under an open-source license, allowing users to access the source code, modify
-  it, and contribute to the project.
+* **YOLOv5**: The program leverages the power of YOLOv5, which is an object detection algorithm, to accurately detect the user’s sitting posture from a webcam.
+* **Real-time Posture Detection**: The program provides real-time feedback on the user's sitting posture, making it suitable for applications in office ergonomics, fitness, and health monitoring.
+* **Good vs. Bad Posture Classification**: The program uses a pre-trained model to classify the detected posture as good or bad, enabling users to improve their posture and prevent potential health issues associated with poor sitting habits.
+* **Open-source**: Released under an open-source license, allowing users to access, modify, and contribute to the project.
+
+
+---
 
 ### Built With
 
 ![Python]
+
+## IEEE Conference Publication
+
+We are pleased to announce that this project has been published in an IEEE conference paper, which provides a comprehensive overview of our methodology, technical approach, and results in applying YOLOv5 for lateral sitting posture detection. This paper, titled **"Lateral Sitting Posture Detection using YOLOv5,"** was presented at the 2024 IEEE International Conference on Biomedical Robotics and Biomechatronics (BioRob). For more in-depth information, please refer to the full paper available at:
+
+**[Read the IEEE Publication on Xplore](https://doi.org/10.1109/BioRob60516.2024.10719953)**
 
 # Getting Started
 
@@ -56,9 +61,11 @@ If you have an NVIDIA graphics processor, you can activate GPU acceleration by i
 
 The default model is loaded if no model file is specified.
 
-# Model
-The program uses a custom trained [YOLOv5s](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5s.yaml) model that is trained on about 160 images per class for 146 epochs. The model has two classes: sitting_good and sitting_bad to give feedback about the current sitting posture.
-## Architecture
+# Model Information
+This project uses a custom-trained [YOLOv5s](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5s.yaml) model fine-tuned on 160 images per class over 146 epochs. It categorizes postures into two classes:
+* `sitting_good`
+* `sitting_bad`
+# Architecture
 The architecture that is used for the model is the standard YOLOv5s architecture:
 
 <img src="https://raw.githubusercontent.com/itakurah/SittingPostureDetection/main/data/images/architecture.png" width=75% height=75%>
@@ -67,7 +74,7 @@ The architecture that is used for the model is the standard YOLOv5s architecture
 
 *Fig. 1: YOLOv5s network architecture (based on Liu et al.). The CBS module consists of a Convolutional layer, a Batch Normalization layer, and a Sigmoid Linear Unit (SiLU) activation function. The C3 module consists of three CBS modules and one bottleneck block. The SPPF module consists of two CBS modules and three Max Pooling layers.*
 
-## Model Results
+# Model Results
 The validation set contains 80 images (40 sitting_good, 40 sitting_bad). The results are as follows:
 |Class|Images|Instances|Precision|Recall|mAP50|mAP50-95|
 |--|--|--|--|--|--|--|
@@ -87,8 +94,7 @@ F1, Precision, Recall, and Precision-Recall plots:
 # About
 
 This project was developed by [Niklas Hoefflin](https://github.com/itakurah), [Tim Spulak](https://github.com/T-Lak),
-Pascal Gerber & Jan Bösch and supervised by [André Jeworutzki](https://github.com/AndreJeworutzki)
-and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg.de/project/TLAM/) module.
+Pascal Gerber & Jan Bösch. It was supervised by [André Jeworutzki](https://github.com/AndreJeworutzki) and Jan Schwarzer as part of the [Train Like A Machine](https://csti.haw-hamburg.de/project/TLAM/) module.
 
 # Sources
 
