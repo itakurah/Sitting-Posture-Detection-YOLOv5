@@ -199,22 +199,30 @@ class View(QMainWindow):
         self.timer_start = QTimer()
         self.timer_stop = QTimer()
 
+        # Color box buttons
         self.button_color_box = QPushButton('', self.groupbox_frame_options)
-        self.button_color_box.move(140, 118)
         self.button_color_box.setFixedHeight(20)
         self.button_color_box.setFixedWidth(20)
         self.button_color_class = QPushButton('', self.groupbox_frame_options)
-        self.button_color_class.move(140, 178)
         self.button_color_class.setFixedHeight(20)
         self.button_color_class.setFixedWidth(20)
         self.button_color_confidence = QPushButton('', self.groupbox_frame_options)
-        self.button_color_confidence.move(140, 148)
         self.button_color_confidence.setFixedHeight(20)
         self.button_color_confidence.setFixedWidth(20)
         self.button_color_bg = QPushButton('', self.groupbox_frame_options)
-        self.button_color_bg.move(140, 208)
         self.button_color_bg.setFixedHeight(20)
         self.button_color_bg.setFixedWidth(20)
+
+        # Move buttons to align with the labels, centered horizontally
+        button_x_position = 140  # Position for the color buttons
+        button_offset = -5  # Horizontal offset to ensure centering
+
+        self.button_color_box.move(button_x_position, 118+button_offset)  # Bounding Box
+        self.button_color_class.move(button_x_position, 178+button_offset)  # Class
+        self.button_color_confidence.move(button_x_position, 148+button_offset)  # Confidence
+        self.button_color_bg.move(button_x_position, 208+button_offset)  # Background
+
+        # Set the colors as needed from the model
         self.button_color_box.setStyleSheet(
             f"background-color: rgb({model.box_color[0]}, {model.box_color[1]}, {model.box_color[2]});border: none")
         self.button_color_class.setStyleSheet(
@@ -282,19 +290,19 @@ class View(QMainWindow):
         model.worker_thread_pause_screen.update_pause_screen.connect(Controller.update_pause_frame)
         model.worker_thread_pause_screen.start()
 
-        # start pause screen thread
-
         # disable stop button on start
         self.button_stop.setEnabled(False)
 
         # set all groupboxes to specific color
-        for groupBox in self.findChildren(QGroupBox):
-            groupBox.setStyleSheet('QGroupBox {background-color: #323844;font-weight: bold;}')
+        # for groupBox in self.findChildren(QGroupBox):
+        #     groupBox.styleSheet() + """QGroupBox {background-color: #323844;}"""
+            #groupBox.setStyleSheet('QGroupBox {background-color: #323844;}')
 
-        for groupBox in self.findChildren(QGroupBox):
-            for widget in groupBox.findChildren(QWidget):
-                if not isinstance(widget, QPushButton):
-                    widget.setStyleSheet('background-color: #323844;font-weight: bold;')
+        # for groupBox in self.findChildren(QGroupBox):
+        #     for widget in groupBox.findChildren(QWidget):
+        #         if not isinstance(widget, QPushButton):
+        #             #widget.styleSheet() + """QWidget {background-color: #323844;}"""
+        #             widget.setStyleSheet('background-color: #323844;')
         self.button_reset_brightness.setStyleSheet('QPushButton {'
                                                    'font-size: 10px;}'
                                                    'QPushButton:enabled {'
@@ -317,59 +325,46 @@ class View(QMainWindow):
                                          'background-color: #4269b9;'
                                          'border: 1px solid white;}'
                                          'QPushButton:enabled:hover {'
-                                         'background-color: #2c4f7a;}'
-                                         'QToolTip {background-color: #323844; font-weight: bold; }')
+                                         'background-color: #2c4f7a;}')
         self.button_flip_horizontal.setStyleSheet('QPushButton {'
                                                   'font-size: 10px;}'
                                                   'QPushButton:enabled {'
                                                   'background-color: #4269b9;'
                                                   'border: 1px solid white;}'
                                                   'QPushButton:enabled:hover {'
-                                                  'background-color: #2c4f7a;}'
-                                                  'QToolTip {background-color: #323844; font-weight: bold; }')
+                                                  'background-color: #2c4f7a;}')
         self.button_flip_vertical.setStyleSheet('QPushButton {'
                                                 'font-size: 10px;}'
                                                 'QPushButton:enabled {'
                                                 'background-color: #4269b9;'
                                                 'border: 1px solid white;}'
                                                 'QPushButton:enabled:hover {'
-                                                'background-color: #2c4f7a;}'
-                                                'QToolTip {background-color: #323844; font-weight: bold; }')
+                                                'background-color: #2c4f7a;}')
         self.button_refresh.setStyleSheet('QPushButton:enabled {'
-                                        'background-color: #4269b9;'
-                                        'border: 1px solid white;}'
-                                        'QPushButton:enabled:hover {'
-                                        'background-color: #2c4f7a;}'
-                                        'QToolTip {background-color: #323844;'
-                                        ' font-weight: bold; }')
+                                          'background-color: #4269b9;'
+                                          'border: 1px solid white;}'
+                                          'QPushButton:enabled:hover {'
+                                          'background-color: #2c4f7a;}')
         self.button_information.setStyleSheet(f'QPushButton {{'
                                               f'background-color: #4269b9;'
                                               f'border-radius : {size / 2};'
                                               f'border: none;}}'
                                               f'QPushButton:enabled:hover {{'
-                                              f'background-color: #2c4f7a;}}'
-                                              f'QToolTip {{background-color: #323844; font-weight: bold;}}')
+                                              f'background-color: #2c4f7a;}}')
 
         self.button_start.setStyleSheet('QPushButton:enabled {'
                                         'background-color: #4269b9;'
                                         'border: 1px solid white;}'
                                         'QPushButton:enabled:hover {'
-                                        'background-color: #2c4f7a;}'
-                                        'QToolTip {background-color: #323844;'
-                                        ' font-weight: bold; }')
+                                        'background-color: #2c4f7a;}')
         self.button_stop.setStyleSheet('QPushButton:enabled {'
                                        'background-color: #4269b9;'
                                        'border: 1px solid white;}'
                                        'QPushButton:enabled:hover {'
-                                       'background-color: #2c4f7a;}'
-                                       'QToolTip {background-color: #323844;'
-                                       ' font-weight: bold; }')
+                                       'background-color: #2c4f7a;}')
         self.button_fullscreen.setStyleSheet('QPushButton:enabled {'
                                              'background-color: transparent;'
-                                             'border: none;}'
-                                             'QToolTip {background-color: #323844;'
-                                             'font-weight: bold;'
-                                             'border: none}')
+                                             'border: none;}')
         self.button_flip_horizontal.pressed.connect(
             lambda: Controller.on_button_pressed(self.button_flip_horizontal, 'data'
                                                                               '/images'
