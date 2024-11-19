@@ -1,9 +1,9 @@
-import os
-import sys
-import tempfile
 
+import sys
+
+import qdarktheme
 from PyQt5.QtWidgets import QApplication
-from qt_material import apply_stylesheet
+
 
 from app_controllers.controller import Controller
 from app_models.model import Model
@@ -29,24 +29,9 @@ if __name__ == '__main__':
         print("Info: Loading default inference model: {}".format(model_name))
     else:
         model_name = sys.argv[1]
-    style = '''<!--?xml version="1.0" encoding="UTF-8"?-->
-    <resources>
-      <color name="primaryColor">#ffffff</color>
-      <color name="primaryLightColor">#6e6d6d</color>
-      <color name="secondaryColor">#323844</color>
-      <color name="secondaryLightColor">#4f5b62</color>
-      <color name="secondaryDarkColor">#31363b</color>
-      <color name="primaryTextColor">#ffffff</color>
-      <color name="secondaryTextColor">#ffffff</color>
-    </resources>'''
+    qdarktheme.enable_hi_dpi()
     app = QApplication([])
+    qdarktheme.setup_theme('dark')
     window = App()
-    with tempfile.NamedTemporaryFile(suffix='.xml', delete=False) as tmp:
-        # Write the XML string to the temporary file
-        tmp.write(style.encode('utf-8'))
-        # Close the temporary file
-        tmp.close()
-        apply_stylesheet(app, theme=tmp.name, css_file='app_views/custom.css')
-    os.unlink(tmp.name)
     window.view.show()
     sys.exit(app.exec())
