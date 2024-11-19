@@ -87,13 +87,11 @@ class View(QMainWindow):
         self.button_stop.move(310, self.button_line_x)
 
         # refresh button properties
-        self.button_refresh = QPushButton('', self)
+        self.button_refresh = QPushButton('Refresh', self)
         self.button_refresh.setToolTip('Refresh camera list')
-        self.button_refresh.setFixedHeight(28)
-        self.button_refresh.setFixedWidth(28)
+        self.button_refresh.setFixedHeight(29)
+        self.button_refresh.setFixedWidth(80)
         self.button_refresh.move(395, self.button_line_x)
-        self.button_refresh.setIcon(QIcon('data/images/refresh.png'))
-        self.button_refresh.setIconSize(QSize(22, 22))
 
         # info button properties
         self.button_information = QPushButton('', self)
@@ -266,8 +264,8 @@ class View(QMainWindow):
         self.button_reset_brightness.setFixedHeight(20)
         self.button_reset_contrast.setFixedWidth(68)
         self.button_reset_contrast.setFixedHeight(20)
-        self.button_reset_contrast.move(150, 312)
-        self.button_reset_brightness.move(150, 267)
+        self.button_reset_contrast.move(160, 312)
+        self.button_reset_brightness.move(160, 267)
 
         self.checkbox_switch_bbox_mode = QCheckBox('Default bounding box color', self.groupbox_frame_options)
         self.checkbox_switch_bbox_mode.move(10, 430)
@@ -337,17 +335,13 @@ class View(QMainWindow):
                                                 'QPushButton:enabled:hover {'
                                                 'background-color: #2c4f7a;}'
                                                 'QToolTip {background-color: #323844; font-weight: bold; }')
-        self.button_refresh.setStyleSheet(f'QPushButton:enabled {{'
-                                          f'background-color: #4269b9;'
-                                          f'border-radius : {28 / 2};'
-                                          f'background-color: #4269b9;'
-                                          f'border: 1px solid white;}}'
-                                          f'QPushButton:disabled {{'
-                                          f'border-radius : {28 / 2};'
-                                          f'border: 1px solid white;}}'
-                                          f'QPushButton:enabled:hover {{'
-                                          f'background-color: #2c4f7a;}}'
-                                          f'QToolTip {{background-color: #323844; font-weight: bold; }}')
+        self.button_refresh.setStyleSheet('QPushButton:enabled {'
+                                        'background-color: #4269b9;'
+                                        'border: 1px solid white;}'
+                                        'QPushButton:enabled:hover {'
+                                        'background-color: #2c4f7a;}'
+                                        'QToolTip {background-color: #323844;'
+                                        ' font-weight: bold; }')
         self.button_information.setStyleSheet(f'QPushButton {{'
                                               f'background-color: #4269b9;'
                                               f'border-radius : {size / 2};'
@@ -413,14 +407,6 @@ class View(QMainWindow):
                                                                                                              '/images'
                                                                                                              '/fullscreen_icon'
                                                                                                              '.png'))
-        self.button_refresh.pressed.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
-                                                                                                      '/images'
-                                                                                                      '/refresh_pressed'
-                                                                                                      '.png'))
-        self.button_refresh.released.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
-                                                                                                       '/images'
-                                                                                                       '/refresh'
-                                                                                                       '.png'))
         self.button_information.pressed.connect(lambda: Controller.on_button_pressed(self.button_information, 'data'
                                                                                                               '/images'
                                                                                                               '/information_pressed'
