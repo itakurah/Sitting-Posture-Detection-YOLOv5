@@ -27,24 +27,23 @@ class AboutWindow(QDialog):
             app_icon_pixmap.scaled(self.app_icon_label.size(), Qt.AspectRatioMode.KeepAspectRatio,
                                    Qt.SmoothTransformation))
         self.label = QLabel(self)
-        self.label.setGeometry(QRect(100, 20, 140, 16))
-        # self.label.setTextFormat(Qt.PlainText)
+        self.label.setGeometry(QRect(100, 20, 150, 16))
         self.label_2 = QLabel(self)
         self.label_2.setGeometry(QRect(100, 170, 301, 16))
         self.label_2.setOpenExternalLinks(True)
         self.label_3 = QLabel(self)
-        self.label_3.setGeometry(QRect(100, 94, 90, 71))
+        self.label_3.setGeometry(QRect(100, 93, 90, 71))
         self.label_4 = QLabel(self)
         self.label_4.setGeometry(QRect(20, 100, 47, 13))
         self.label_5 = QLabel(self)
-        self.label_5.setGeometry(QRect(100, 40, 47, 13))
+        self.label_5.setGeometry(QRect(100, 40, 57, 13))
         self.label_6 = QLabel(self)
         self.label_6.setGeometry(QRect(20, 170, 41, 13))
         self.groupBox = QGroupBox(self)
         self.groupBox.setGeometry(QRect(20, 270, 380, 221))
         self.groupBox.setAlignment(Qt.AlignCenter)
         self.groupBox.setCheckable(False)
-        self.groupBox.setStyleSheet("QGroupBox::title {"
+        self.groupBox.setStyleSheet("QGroupBox{background-color: transparent;};QGroupBox::title {"
                                     "subcontrol-origin: margin;"
                                     "subcontrol-position: top center;}")
         self.groupBox.setTitle('MIT License')
@@ -58,6 +57,7 @@ class AboutWindow(QDialog):
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 322, 513))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
+
         self.label_7 = QLabel(self.scrollAreaWidgetContents)
         self.label_7.setEnabled(True)
         self.label_7.setInputMethodHints(Qt.ImhNone)
@@ -74,10 +74,6 @@ class AboutWindow(QDialog):
         self.label_9.setGeometry(QRect(100, 240, 151, 16))
         self.label_9.setTextFormat(Qt.MarkdownText)
         self.label_9.setOpenExternalLinks(True)
-        self.label_10 = QLabel(self)
-        self.label_10.setGeometry(QRect(270, 200, 131, 16))
-        self.label_10.setTextFormat(Qt.MarkdownText)
-        self.label_10.setOpenExternalLinks(True)
         self.label_11 = QLabel(self)
         self.label_11.setGeometry(QRect(255, 240, 126, 16))
         self.label_11.setTextFormat(Qt.MarkdownText)
@@ -101,14 +97,19 @@ class AboutWindow(QDialog):
         self.label.setText("Sitting Posture Detector")
         self.label_3.setText("<html><head/><body>Niklas Hoefflin<br/>Tim Spulak<br/>Jan B\u00f6sch<br/>Pascal "
                              "Gerber</body></html>")
+        self.label_3.setStyleSheet('QLabel{font-weight: normal}')
         self.label_4.setText("Authors:")
+        self.label_4.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_5.setText("Commit:")
         self.label_15.setText('{}'.format(model.commit_hash))
         self.label_6.setText("GitHub:")
+        self.label_6.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_2.setText("<html><head/><body><p><a href=\"https://github.com/itakurah/SittingPostureDetection"
                              "\"><span style=\" text-decoration: underline; "
                              "color:#4269b9;\">https://github.com/itakurah/SittingPostureDetection</span></a></p"
                              "></body></html>")
+        self.label_2.setStyleSheet('QLabel{font-weight: normal;}')
+        self.label_7.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_7.setText(
             "<html><head/><body><p><span style=\" font-family:'Courier New';\">MIT License</span></p><p><span "
             "style=\" font-family:'Courier New';\">Copyright (c) 2023 Niklas Hoefflin</span></p><p><span style=\" "
@@ -125,30 +126,32 @@ class AboutWindow(QDialog):
             "OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN "
             "CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span></p></body></html>")
         self.label_8.setText("Icons:")
+        self.label_8.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_9.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/37303/informationen\"><span "
                              "style=\" text-decoration: underline; color:#4269b9;\">Information</span></a> icon by <a "
                              "href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
                              "color:#4269b9;\">Icons8</span></a></p></body></html>")
-        self.label_10.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/14296/refresh\"><span "
-                              "style=\" text-decoration: underline; color:#4269b9;\">Refresh</span></a> icon by <a "
-                              "href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
-                              "color:#4269b9;\">Icons8</span></a></p></body></html>")
+        self.label_9.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_11.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/37308/rotate\"><span style=\" "
                               "text-decoration: underline; color:#4269b9;\">Rotate</span></a> icon by <a "
                               "href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
                               "color:#4269b9;\">Icons8</span></a></p></body></html>")
+        self.label_11.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_12.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/8183/expand\"><span style=\" "
                               "text-decoration: underline; color:#4269b9;\">Expand</span></a> icon by <a "
                               "href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
                               "color:#4269b9;\">Icons8</span></a></p></body></html>")
+        self.label_12.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_13.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/8162/flip-horizontal\"><span "
                               "style=\" text-decoration: underline; color:#4269b9;\">Flip Horizontal</span></a> icon "
                               "by <a href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
                               "color:#4269b9;\">Icons8</span></a></p></body></html>")
+        self.label_13.setStyleSheet('QLabel{font-weight: normal;}')
         self.label_14.setText("<html><head/><body><p><a href=\"https://icons8.com/icon/8171/flip-vertical\"><span "
                               "style=\" text-decoration: underline; color:#4269b9;\">Flip Vertical</span></a> icon by "
                               "<a href=\"https://icons8.com\"><span style=\" text-decoration: underline; "
                               "color:#4269b9;\">Icons8</span></a></p></body></html>")
+        self.label_14.setStyleSheet('QLabel{font-weight: normal;}')
 
     def showEvent(self, event):
         # Calculate the center position based on the parent window

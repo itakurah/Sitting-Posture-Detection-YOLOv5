@@ -1,9 +1,7 @@
-
 import sys
 
 import qdarktheme
 from PyQt5.QtWidgets import QApplication
-
 
 from app_controllers.controller import Controller
 from app_models.model import Model
@@ -32,6 +30,26 @@ if __name__ == '__main__':
     qdarktheme.enable_hi_dpi()
     app = QApplication([])
     qdarktheme.setup_theme('dark')
+    # update global stylesheet
+    current_stylesheet = app.styleSheet()
+    updated_stylesheet = current_stylesheet + """
+        QSlider {background-color: #323844;}
+        QGroupBox {background-color: #323844;}
+        QLabel {font-weight: bold;}
+        QPushButton{font-weight: bold;}
+        QCheckBox {font-weight: bold;}
+        QRadioButton {font-weight: bold;}
+        QComboBox {font-weight: bold;}
+        QToolTip {
+            background-color: #323844;
+            color: white;
+            font-size: 12px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            padding: 5px;
+        }
+    """
+    app.setStyleSheet(updated_stylesheet)
     window = App()
     window.view.show()
     sys.exit(app.exec())
