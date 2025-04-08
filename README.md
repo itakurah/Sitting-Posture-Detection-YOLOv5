@@ -65,6 +65,9 @@ The default model is loaded if no model file is specified.
 This project uses a custom-trained [YOLOv5s](https://github.com/ultralytics/yolov5/blob/79af1144c270ac7169553d450b9170f9c60f92e4/models/yolov5s.yaml) model fine-tuned on 160 images per class over 146 epochs. It categorizes postures into two classes:
 * `sitting_good`
 * `sitting_bad`
+
+The trained model file is located under the following directory:
+`data/inference_models/small640.pt`
 # Architecture
 The architecture that is used for the model is the standard YOLOv5s architecture:
 
