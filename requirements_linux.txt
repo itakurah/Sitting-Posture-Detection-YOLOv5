@@ -3,7 +3,7 @@ torch==2.0.0
 torchaudio==2.0.1
 torchvision==0.15.1
 numpy==1.24.2
-opencv-python-headless==4.7.0.72
+opencv-python-headless==4.8.1.78
 PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.11.1
