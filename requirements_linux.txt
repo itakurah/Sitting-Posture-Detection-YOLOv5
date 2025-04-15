@@ -1,7 +1,7 @@
 huggingface-hub==0.24.7
-torch==2.0.0
-torchaudio==2.0.1
-torchvision==0.15.1
+torch==2.2.0
+torchaudio==2.2.0
+torchvision==0.17
 numpy==1.24.2
 opencv-python-headless==4.8.1.78
 PyQt5==5.15.9
