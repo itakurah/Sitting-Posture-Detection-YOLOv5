@@ -1,7 +1,7 @@
 huggingface-hub==0.24.7
-torch==2.0.0
-torchaudio==2.0.1+cu117
-torchvision==0.15.1
+torch==2.2.0+cu118
+torchaudio==2.2.0+cu118
+torchvision==0.17+cu118
 -f https://download.pytorch.org/whl/torch_stable.html
 numpy==1.24.2
 opencv-python==4.8.1.78
