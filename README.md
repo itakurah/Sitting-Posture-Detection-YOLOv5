@@ -34,7 +34,7 @@ We are pleased to announce that this project has been published in an IEEE confe
 
 ### Prerequisites
 
-* Python 3.9.x
+* Python 3.9.X
 
 ### Installation  
 If you have an NVIDIA graphics processor, you can activate GPU acceleration by installing the GPU requirements. Note that without GPU acceleration, the inference will run on the CPU, which can be very slow.  
